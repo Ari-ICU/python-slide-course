@@ -465,7 +465,7 @@ export function SlideRenderer({
                       <span className="text-sm font-bold text-foreground">{col.title}</span>
                       <span
                         className={cn(
-                          "rounded px-2 py-0.5 font-mono text-[10px] font-bold",
+                          "shrink-0 whitespace-nowrap rounded px-2 py-0.5 font-mono text-[10px] font-bold",
                           st.badge
                         )}
                       >

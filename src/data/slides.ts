@@ -567,12 +567,12 @@ print(f"20% off single price: \${price * 0.8:.2f}")`,
     ],
     codeBlock: {
       title: "Test All 7 Math Operators Live",
-      code: `cookies = 17
-students = 5
+      code: `total_cookies = 17
+student_count = 5
 
-print("Exact share (/):", cookies / students)
-print("Whole cookies each (//):", cookies // students)
-print("Leftover cookies (%):", cookies % students)
+print("Exact share (/):", total_cookies / student_count)
+print("Whole cookies each (//):", total_cookies // student_count)
+print("Leftover cookies (%):", total_cookies % student_count)
 print("Power (2 ** 5):", 2 ** 5)`,
     },
     notes: {
@@ -608,27 +608,27 @@ print("Power (2 ** 5):", 2 ** 5)`,
       {
         pill: ">=   <=",
         accent: "emerald",
-        example: "score >= 60  ->  True (if 60+)",
+        example: "exam_score >= 60  ->  True (if 60+)",
         desc: "Greater-than-or-equal (`>=`) and less-than-or-equal (`<=`). Put `<` or `>` BEFORE `=`.",
-        tip: "Pass mark 60+: `score >= 60`",
+        tip: "Passing score 60+: `exam_score >= 60`",
       },
       {
         pill: "Chained Ranges",
         accent: "purple",
-        example: "0 <= score <= 100",
+        example: "0 <= exam_score <= 100",
         desc: "Python lets you write natural math ranges cleanly in one check!",
-        tip: "Checks both `0 <= score` and `score <= 100`",
+        tip: "Checks both `0 <= exam_score` and `exam_score <= 100`",
       },
     ],
     codeBlock: {
       title: "Ask True/False Questions Live",
-      code: `score = 85
-pass_mark = 60
+      code: `exam_score = 85
+passing_score = 60
 
-print("Passed?", score >= pass_mark)
-print("Perfect 100?", score == 100)
-print("Not zero?", score != 0)
-print("Valid 0..100?", 0 <= score <= 100)`,
+print("Passed?", exam_score >= passing_score)
+print("Perfect 100?", exam_score == 100)
+print("Not zero?", exam_score != 0)
+print("Valid 0..100?", 0 <= exam_score <= 100)`,
     },
     notes: {
       duration: "4 min",
@@ -650,39 +650,51 @@ print("Valid 0..100?", 0 <= score <= 100)`,
         title: "and — Both Must Be True",
         tone: "blue",
         rule: "True and True -> True",
-        example: "has_ticket and age >= 18",
+        example:
+          "exam_score = 85\nhas_student_id = True\nexam_score >= 60 and has_student_id  # -> True",
         desc: "Strict gatekeeper: if **either** side is `False`, the whole expression becomes `False`.",
       },
       {
         title: "or — At Least One True",
         tone: "emerald",
         rule: "False or True -> True",
-        example: "is_student or is_senior",
+        example:
+          "has_student_id = False\nhas_scholarship = True\nhas_student_id or has_scholarship  # -> True",
         desc: "Flexible pass: succeeds as long as **any one** condition is `True`.",
       },
       {
         title: "not — Flips True <-> False",
         tone: "amber",
         rule: "not False -> True",
-        example: "not is_banned",
+        example:
+          "is_account_locked = False\n# Flips False to True:\nnot is_account_locked  # -> True",
         desc: "Reverses a boolean value to its opposite (`not True` becomes `False`).",
       },
     ],
     codeBlock: {
       title: "Try Changing True / False Values",
-      code: `age = 19
-has_id = True
-is_vip = False
+      code: `exam_score = 85
+has_student_id = True
+has_scholarship = False
+is_account_locked = False
 
-can_enter = (age >= 18 and has_id) or is_vip
-print("Allowed inside?", can_enter)
-print("Needs supervision?", not (age >= 18))`,
+# 1. and — both checks must be True
+can_take_exam = exam_score >= 60 and has_student_id
+print("Can take exam?", can_take_exam)
+
+# 2. or — at least one check must be True
+gets_discount = has_student_id or has_scholarship
+print("Gets discount?", gets_discount)
+
+# 3. not — flips False <-> True
+can_login = not is_account_locked
+print("Can log in?", can_login)`,
     },
     notes: {
       duration: "4 min",
       goal: "Make `and`, `or`, and `not` intuitive through real-life rules.",
-      say: "Change `age = 15` and `is_vip = True` live in class to show how `or` lets the VIP inside.",
-      ask: "If `age = 16`, `has_id = True`, and `is_vip = False`, what does `can_enter` become?",
+      say: "Change `exam_score = 50` or `is_account_locked = True` live in class to show how `and`, `or`, and `not` each react.",
+      ask: "If `has_student_id = False` and `has_scholarship = True`, what do `can_take_exam` and `gets_discount` become?",
       watchOut: "Classic bug: writing `day == \"Sat\" or \"Sun\"` instead of `day == \"Sat\" or day == \"Sun\"`.",
     },
   },

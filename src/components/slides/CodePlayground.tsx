@@ -113,7 +113,7 @@ export function CodePlayground({
     resolvedSize === "workspace"
       ? "min-h-[340px] max-h-[540px]"
       : resolvedSize === "compact"
-        ? "min-h-[140px] max-h-[240px]"
+        ? "min-h-[140px] max-h-[320px]"
         : "min-h-[190px] max-h-[300px]";
   const outputMaxHeightClass =
     resolvedSize === "workspace" ? "max-h-72" : "max-h-40";
