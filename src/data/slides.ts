@@ -751,18 +751,20 @@ print("Final grade:", grade)`,
     lead: "Test your understanding part by part before moving on to loops!",
     questions: [
       {
-        prompt: "What does `17 // 5` and `17 % 5` print?",
-        code: `print(17 // 5, 17 % 5)`,
+        prompt: "What does `total_cookies // student_count` and `%` print?",
+        code: `total_cookies = 17
+student_count = 5
+print(total_cookies // student_count, total_cookies % student_count)`,
         options: ["3.4 2", "3 2", "2 3", "3 0"],
         answerIndex: 1,
         explanation: "`17 // 5` is whole division (`3`) and `17 % 5` is the remainder (`2`).",
       },
       {
-        prompt: "What is printed when `temp = 25`?",
-        code: `temp = 25
-if temp > 30:
+        prompt: "What is printed when `temperature = 25`?",
+        code: `temperature = 25
+if temperature > 30:
     print("Hot")
-elif temp > 20:
+elif temperature > 20:
     print("Warm")
 else:
     print("Cool")`,
@@ -771,13 +773,14 @@ else:
         explanation: "`25 > 30` is `False`, so Python checks `elif`: `25 > 20` is `True`, prints `\"Warm\"`, and skips `else`.",
       },
       {
-        prompt: 'Which line validly checks if `status` equals `"ready"`?',
-        code: `# Pick the valid Python syntax:`,
+        prompt: 'Which line validly checks if `order_status` equals `"ready"`?',
+        code: `order_status = "ready"
+# Pick the valid if line:`,
         options: [
-          'if status = "ready":',
-          'if status == "ready"',
-          'if status == "ready":',
-          'if status is equal "ready":',
+          'if order_status = "ready":',
+          'if order_status == "ready"',
+          'if order_status == "ready":',
+          'if order_status is equal "ready":',
         ],
         answerIndex: 2,
         explanation: "Equality comparison uses `==` and every `if` line must end with a colon `:`.",
@@ -787,7 +790,7 @@ else:
       duration: "4 min",
       goal: "Verify arithmetic operators, conditional ordering, and `==` + `:` syntax.",
       say: "Have students vote on each question before revealing the explanation.",
-      ask: "In Q1, what would `17 / 5` print instead of `17 // 5`?",
+      ask: "In Q1, what would `total_cookies / student_count` print instead of `total_cookies // student_count`?",
       watchOut: "If students miss Q3, quickly review `=` vs `==` and trailing `:`.",
     },
   },
@@ -1199,25 +1202,25 @@ print(f"Buy one of each: \${total_all:.2f}")`,
     lead: "Verify indexing, slicing, and dictionary lookup before we move to functions!",
     questions: [
       {
-        prompt: "What does `items[-2]` print?",
-        code: `items = ["a", "b", "c", "d"]
-print(items[-2])`,
-        options: ['"b"', '"c"', '"d"', "IndexError"],
+        prompt: "What does `fruits[-2]` print?",
+        code: `fruits = ["apple", "banana", "cherry", "mango"]
+print(fruits[-2])`,
+        options: ['"banana"', '"cherry"', '"mango"', "IndexError"],
         answerIndex: 1,
-        explanation: "`-1` is the last item (`\"d\"`), so `-2` steps one left to `\"c\"`.",
+        explanation: "`-1` is the last item (`\"mango\"`), so `-2` steps one left to `\"cherry\"`.",
       },
       {
-        prompt: "What does `nums[1:3]` return?",
-        code: `nums = [10, 20, 30, 40]
-print(nums[1:3])`,
+        prompt: "What does `scores[1:3]` return?",
+        code: `scores = [10, 20, 30, 40]
+print(scores[1:3])`,
         options: ["[10, 20, 30]", "[20, 30]", "[20, 30, 40]", "[10, 20]"],
         answerIndex: 1,
         explanation: "Slicing starts at index `1` (`20`) and stops BEFORE index `3` (`40`), giving `[20, 30]`.",
       },
       {
         prompt: "What prints when a key is missing with `.get()`?",
-        code: `user = {"name": "Sam"}
-print(user.get("role", "Guest"))`,
+        code: `student = {"name": "Sam"}
+print(student.get("role", "Guest"))`,
         options: ["KeyError crash", "None", "Guest", "Sam"],
         answerIndex: 2,
         explanation: "`.get(key, default)` safely returns the fallback `\"Guest\"` instead of crashing.",
