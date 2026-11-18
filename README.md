@@ -9,7 +9,7 @@ A modern, clean, interactive presentation deck for teaching and learning Python 
 - **Step-by-Step Memory Tracer**: Step through code line-by-line while watching variable boxes update live in memory.
 - **Interactive Checkpoints & Practice Labs**: Built-in multiple-choice quizzes with instant explanations and guided coding labs with hints and sample solutions.
 - **Teacher Presenter Notes (`N`)**: Slide-over drawer with time estimates, learning goals, speaking prompts, student questions, and common pitfall alerts.
-- **Live Python Scratchpad (`P`)**: Pop-open sandbox accessible from any slide to test student "What if...?" questions live.
+- **Live Python Scratchpad (`/scratchpad` or `P`)**: Dedicated standalone sandbox page with starter templates, syntax reference, and auto-saved edits to test student "What if...?" questions live.
 - **Classroom Ready**: Light/Dark theme toggle (`T`), Fullscreen (`F`), Slides Overview grid (`O`), URL hash linking (`#slide-12`), and Print / Save PDF export.
 
 ## Getting Started
@@ -26,7 +26,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `←` / `→` / `Space`: Previous / Next slide
 - `O`: Toggle Slides Overview grid
 - `N`: Toggle Teacher Presenter Notes
-- `P`: Toggle Live Python Scratchpad
+- `P`: Open the Live Python Scratchpad page (`/scratchpad`)
 - `T`: Toggle Light / Dark theme
 - `F`: Toggle Fullscreen
 

@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import {
   BookOpen,
@@ -18,7 +20,7 @@ import {
   Sun,
   Terminal,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,20 +37,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { OverviewDialog } from "@/components/slides/OverviewDialog";
-import { ScratchpadSheet } from "@/components/slides/ScratchpadSheet";
 import { SlideRenderer } from "@/components/slides/SlideRenderer";
 import { TeacherNotesSheet } from "@/components/slides/TeacherNotesSheet";
+import {
+  readLastSlideNumber,
+  readStoredTheme,
+  saveLastSlideNumber,
+  saveThemePreference,
+} from "@/lib/course-storage";
+import { cn } from "@/lib/utils";
 import { MODULES, SLIDES } from "@/data/slides";
 
 export function SlideDeck() {
+  const router = useRouter();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [direction, setDirection] = useState(1);
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
-  const [scratchpadOpen, setScratchpadOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const hasRestoredRef = useRef(false);
 
   const slide = SLIDES[currentIdx] || SLIDES[0];
   const currentModule = MODULES.find((m) => m.id === slide.moduleId) || MODULES[0];
@@ -71,24 +80,51 @@ export function SlideDeck() {
     [goToSlide]
   );
 
-  // Sync URL hash on initial load (deferred to animation frame for clean React 19 hydration)
+  // Sync URL hash, remembered slide, and theme on initial load
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
+      hasRestoredRef.current = true;
+      let targetIdx = 0;
+
       const match = window.location.hash.match(/^#slide-(\d+)$/);
       if (match) {
         const idx = parseInt(match[1], 10) - 1;
         if (idx >= 0 && idx < SLIDES.length) {
-          setCurrentIdx(idx);
+          targetIdx = idx;
+        }
+      } else {
+        const savedSlide = readLastSlideNumber();
+        if (savedSlide && savedSlide >= 1 && savedSlide <= SLIDES.length) {
+          targetIdx = savedSlide - 1;
         }
       }
-      setIsDark(document.documentElement.classList.contains("dark"));
+
+      if (targetIdx > 0) {
+        setCurrentIdx(targetIdx);
+      } else {
+        saveLastSlideNumber(1);
+        if (window.location.hash !== "#slide-1") {
+          window.history.replaceState(null, "", "#slide-1");
+        }
+      }
+
+      const storedTheme = readStoredTheme();
+      const dark =
+        storedTheme !== null
+          ? storedTheme === "dark"
+          : document.documentElement.classList.contains("dark");
+      document.documentElement.classList.toggle("dark", dark);
+      setIsDark(dark);
     });
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Update URL hash when slide changes
+  // Update URL hash and remembered slide when slide changes
   useEffect(() => {
-    const targetHash = `#slide-${currentIdx + 1}`;
+    if (!hasRestoredRef.current) return;
+    const slideNumber = currentIdx + 1;
+    saveLastSlideNumber(slideNumber);
+    const targetHash = `#slide-${slideNumber}`;
     if (window.location.hash !== targetHash) {
       window.history.replaceState(null, "", targetHash);
     }
@@ -98,6 +134,7 @@ export function SlideDeck() {
     setIsDark((prev) => {
       const next = !prev;
       document.documentElement.classList.toggle("dark", next);
+      saveThemePreference(next);
       return next;
     });
   }, []);
@@ -131,14 +168,14 @@ export function SlideDeck() {
           target.tagName === "SELECT" ||
           target.isContentEditable);
 
-      if (isEditing) return;
+      if (isEditing || e.metaKey || e.ctrlKey || e.altKey) return;
 
       if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
-        if (overviewOpen || notesOpen || scratchpadOpen) return;
+        if (overviewOpen || notesOpen) return;
         e.preventDefault();
         goToSlide(currentIdx + 1);
       } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
-        if (overviewOpen || notesOpen || scratchpadOpen) return;
+        if (overviewOpen || notesOpen) return;
         e.preventDefault();
         goToSlide(currentIdx - 1);
       } else if (e.key === "o" || e.key === "O") {
@@ -149,7 +186,8 @@ export function SlideDeck() {
         setNotesOpen((n) => !n);
       } else if (e.key === "p" || e.key === "P") {
         e.preventDefault();
-        setScratchpadOpen((p) => !p);
+        saveLastSlideNumber(currentIdx + 1);
+        router.push("/scratchpad");
       } else if (e.key === "t" || e.key === "T") {
         e.preventDefault();
         toggleTheme();
@@ -166,7 +204,7 @@ export function SlideDeck() {
     goToSlide,
     overviewOpen,
     notesOpen,
-    scratchpadOpen,
+    router,
     toggleTheme,
     toggleFullscreen,
   ]);
@@ -279,18 +317,19 @@ export function SlideDeck() {
               <Tooltip>
                 <TooltipTrigger
                   render={
-                    <Button
-                      type="button"
-                      variant={scratchpadOpen ? "secondary" : "ghost"}
-                      size="sm"
-                      onClick={() => setScratchpadOpen(true)}
+                    <Link
+                      href="/scratchpad"
+                      onClick={() => saveLastSlideNumber(currentIdx + 1)}
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "sm" })
+                      )}
                     />
                   }
                 >
                   <Code2 />
-                  <span className="hidden sm:inline">Sandbox</span>
+                  <span className="hidden sm:inline">Scratchpad</span>
                 </TooltipTrigger>
-                <TooltipContent>Live Python Scratchpad (P)</TooltipContent>
+                <TooltipContent>Open Live Python Scratchpad (P)</TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -459,11 +498,6 @@ export function SlideDeck() {
           slide={slide}
           slideNumber={currentIdx + 1}
           totalSlides={SLIDES.length}
-        />
-
-        <ScratchpadSheet
-          open={scratchpadOpen}
-          onOpenChange={setScratchpadOpen}
         />
       </div>
 
