@@ -1,6 +1,6 @@
 /**
  * Curriculum & Slide Deck Data for "Python Programming — Short Course"
- * 33 detailed, part-by-part slides across 7 structured modules (00 through 06).
+ * 35 detailed, part-by-part slides across 7 structured modules (00 through 06).
  */
 
 export type AccentTone = "blue" | "amber" | "emerald" | "purple" | "red";
@@ -129,8 +129,8 @@ export const SLIDES: SlideData[] = [
     subtitle:
       "A clear, part-by-part introduction to Python — every concept broken down into small visual steps with live runnable examples.",
     highlights: [
-      { icon: "play", label: "Live Code on Every Topic", detail: "Edit & run Python right inside the slide" },
-      { icon: "layers", label: "Part-by-Part Breakdowns", detail: "Inspect syntax & watch memory step by step" },
+      { icon: "play", label: "Live Code & Python IDE", detail: "Run slide demos inline or open the full /scratchpad IDE" },
+      { icon: "layers", label: "Part-by-Part Breakdowns", detail: "Learn IDE tools, syntax anatomy & memory step by step" },
       { icon: "check", label: "Practice Labs & Quizzes", detail: "Check understanding after every core skill" },
     ],
     roadmap: [
@@ -185,6 +185,108 @@ print("Total minutes:", hours * 60)`,
       say: "Click Run Code and walk down lines 1 -> 2 -> 4 -> 5 to show execution order.",
       ask: "What repetitive task in your school or job would you love to automate?",
       watchOut: "Students sometimes think code reads bottom-up or all at once. Emphasize strict top-to-bottom order.",
+    },
+  },
+  {
+    id: "what-is-ide",
+    moduleId: "intro",
+    layout: "type-cards",
+    badge: "Module 00 • IDE & Core Tools",
+    title: "What Is an IDE? (Editor, Runner, Console & Files)",
+    lead: "An **IDE (Integrated Development Environment)** is your coding workspace. Instead of plain Notepad, an IDE gives you a smart editor, Python engine, console terminal, and variable inspector together.",
+    syntaxAnatomy: {
+      title: "4 Core Parts of Any Python IDE",
+      parts: [
+        { token: "Code Editor", label: "Write .py Files", explain: "Highlights syntax colors, numbers every line, and handles 4-space indentation.", tone: "blue" },
+        { token: "Interpreter", label: "Run Engine", explain: "Python 3 checks grammar and executes your instructions line by line.", tone: "amber" },
+        { token: "Console", label: "Output & Errors", explain: "Shows `print()` output, `input()` prompts, and traceback clues.", tone: "emerald" },
+        { token: "Variables", label: "Memory View", explain: "Inspect live variable names, types, and values while debugging.", tone: "purple" },
+      ],
+    },
+    cards: [
+      {
+        pill: ".py Files & Modules",
+        accent: "blue",
+        example: "main.py  •  utils.py",
+        desc: "Python programs are plain text files ending in `.py`. Larger apps organize helpers into files you can `import`.",
+        tip: "Use lowercase names without spaces like `my_app.py`.",
+      },
+      {
+        pill: "Syntax Highlighting",
+        accent: "purple",
+        example: 'def greet():  # comment',
+        desc: "IDEs color keywords, text strings, numbers, and `#` comments differently so typos jump out immediately.",
+        tip: "If text stays green, check for a missing closing quote!",
+      },
+      {
+        pill: "Auto-Indent (4 Spaces)",
+        accent: "amber",
+        example: 'if score >= 80:\n    print("Pass")',
+        desc: "Python uses **4-space indentation** after a colon `:` to group code blocks. Good IDEs indent automatically on `Enter`.",
+        tip: "Never mix Tabs and spaces — stick to 4 spaces.",
+      },
+      {
+        pill: "Tracebacks & Bugs",
+        accent: "emerald",
+        example: 'File "main.py", line 3\nNameError: ...',
+        desc: "When code hits a bug, the Console prints a **traceback** showing the exact file, line number, and error name.",
+        tip: "Read tracebacks from the bottom line up!",
+      },
+    ],
+    notes: {
+      duration: "4 min",
+      goal: "Demystify IDEs, .py files, syntax highlighting, indentation, and tracebacks before writing code.",
+      say: "Point out each part of an IDE and mention that students already have this exact layout in our Scratchpad page (`P`).",
+      ask: "Why is syntax highlighting and a line number gutter so helpful when learning?",
+      watchOut: "Reassure students not to fear red traceback messages — they tell you the exact line number to check.",
+    },
+  },
+  {
+    id: "choose-ide",
+    moduleId: "intro",
+    layout: "compare",
+    badge: "Module 00 • IDE & Setup",
+    title: "Python IDEs: Desktop Tools & Our Browser IDE",
+    lead: "Programmers choose different IDEs depending on their project. For this course, you can start immediately with our built-in **Python 3.12 IDE** (`/scratchpad`) — zero installation required!",
+    columns: [
+      {
+        title: "Course Browser IDE (/scratchpad)",
+        tone: "blue",
+        rule: "Built-In • Zero Setup",
+        example: "# Press P or Open Python IDE\nimport json, math\nprint(round(math.pi, 4))",
+        desc: "Runs real **Python 3.12 (CPython Wasm)** right in your browser with multi-file tabs, Console, Stdin, and live Variables inspector.",
+      },
+      {
+        title: "VS Code / PyCharm",
+        tone: "purple",
+        rule: "Industry Desktop IDEs",
+        example: "# Run in local terminal:\npython main.py\n# or python3 main.py",
+        desc: "Popular desktop IDEs with file explorers, extensions, virtual environments (`venv`), Git integration, and step debuggers.",
+      },
+      {
+        title: "IDLE & Jupyter Notebook",
+        tone: "emerald",
+        rule: "Starter & Data Science",
+        example: ">>> 2 + 2\n4\n>>> name = 'Ada'",
+        desc: "IDLE ships inside the official `python.org` installer; Jupyter Notebooks combine notes, charts, and runnable cells for data analysis.",
+      },
+    ],
+    codeBlock: {
+      title: "Try IDE Standard Library: math Module + round()",
+      code: `# Try running standard library code right here or in /scratchpad
+import math
+
+radius = 5
+area = round(math.pi * radius * radius, 2)
+print("Circle area:", area)
+print("Type:", type(area))`,
+    },
+    notes: {
+      duration: "4 min",
+      goal: "Show students real-world Python IDEs (VS Code, PyCharm, IDLE, Jupyter) and introduce the built-in /scratchpad Python 3 IDE.",
+      say: "Tell students: press P anytime to open the standalone Python IDE (/scratchpad), create multiple .py files, and run full Python 3 code.",
+      ask: "Have you ever installed VS Code or Python on your laptop before?",
+      watchOut: "Remind Windows/macOS desktop learners that macOS often uses `python3` in terminal while Windows uses `python` or `py`.",
     },
   },
 

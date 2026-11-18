@@ -3,180 +3,195 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
+  AlertTriangle,
   ArrowLeft,
-  BookOpen,
+  Check,
+  ChevronDown,
   Code2,
+  Copy,
+  Download,
   Eraser,
+  FileCode2,
+  Loader2,
   Moon,
+  Play,
+  Plus,
+  RotateCcw,
   Sparkles,
   Sun,
   Terminal,
+  Trash2,
+  Variable,
+  X,
 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CodePlayground } from "@/components/slides/CodePlayground";
+import { PythonIdeEditor } from "@/components/slides/PythonIdeEditor";
 import {
+  createEmptyWorkspace,
+  readIdeWorkspace,
   readLastSlideNumber,
-  readScratchpadDraft,
   readStoredTheme,
-  saveScratchpadDraft,
+  saveIdeWorkspace,
   saveThemePreference,
+  type IdeFile,
+  type IdeWorkspaceState,
 } from "@/lib/course-storage";
+import {
+  ensurePyodideLoaded,
+  isPyodideReady,
+  runIdePython,
+  type IdeEngineStatus,
+  type IdeRunResult,
+} from "@/lib/pyodide-runtime";
 import { cn } from "@/lib/utils";
 
-interface ScratchpadPreset {
+interface IdeExample {
   id: string;
   label: string;
-  summary: string;
-  code: string;
-  inputs?: string[];
+  description: string;
+  files: IdeFile[];
+  stdin?: string;
 }
 
-export const SCRATCHPAD_PRESETS: ScratchpadPreset[] = [
+const OPTIONAL_EXAMPLES: IdeExample[] = [
   {
-    id: "variables",
-    label: "Variables & f-strings",
-    summary: "Store values, compute expressions, and format text output.",
-    code: `name = "Student"
-hours = 3
-minutes = hours * 60
-print(f"Hello {name}! Practicing {minutes} mins today.")`,
+    id: "stdlib",
+    label: "Standard Library (math, json, datetime)",
+    description: "Real Python 3 modules & f-string formatting",
+    files: [
+      {
+        name: "main.py",
+        content: `import json
+import math
+from datetime import date
+
+payload = {
+    "course": "Python 3",
+    "date": date.today().isoformat(),
+    "circle_area": round(math.pi * (5 ** 2), 2),
+}
+
+print(json.dumps(payload, indent=2))`,
+      },
+    ],
   },
   {
-    id: "conditions",
-    label: "If / Elif / Else",
-    summary: "Branch program logic cleanly based on conditions.",
-    code: `score = 84
+    id: "multifile",
+    label: "Multi-File Project (main.py + utils.py)",
+    description: "Import functions across tabs",
+    files: [
+      {
+        name: "main.py",
+        content: `from utils import summarize_scores
 
-if score >= 90:
-    grade = "A"
-elif score >= 80:
-    grade = "B"
-elif score >= 70:
-    grade = "C"
-else:
-    grade = "Needs Practice"
-
-print(f"Score {score} -> Grade {grade}")`,
+scores = [92, 85, 78, 96, 88]
+report = summarize_scores("Class A", scores)
+print(report)`,
+      },
+      {
+        name: "utils.py",
+        content: `def summarize_scores(group: str, nums: list[int]) -> dict:
+    avg = sum(nums) / len(nums)
+    return {
+        "group": group,
+        "count": len(nums),
+        "average": round(avg, 2),
+        "highest": max(nums),
+    }`,
+      },
+    ],
   },
   {
-    id: "loops",
-    label: "Loop + Comprehension",
-    summary: "Filter even numbers and transform items in one clean pass.",
-    code: `nums = [4, 11, 8, 15, 22, 7]
-evens = [n for n in nums if n % 2 == 0]
-doubled = [n * 2 for n in evens]
+    id: "dataclass-oop",
+    label: "OOP + @dataclass & Inheritance",
+    description: "Python 3.12 classes, type hints, and methods",
+    files: [
+      {
+        name: "main.py",
+        content: `from dataclasses import dataclass
 
-print("Even numbers:", evens)
-print("Doubled:", doubled)`,
+@dataclass
+class Course:
+    title: str
+    lessons: int
+
+class InteractiveCourse(Course):
+    def summary(self) -> str:
+        return f"{self.title} ({self.lessons} lessons interactive)"
+
+course = InteractiveCourse("Python Fundamentals", 33)
+print(course.summary())`,
+      },
+    ],
   },
   {
-    id: "dicts",
-    label: "Dicts & Functions",
-    summary: "Define reusable helpers that process a list of dictionaries.",
-    code: `students = [
-    {"name": "Dara", "score": 88},
-    {"name": "Sokha", "score": 95},
-    {"name": "Vanna", "score": 76},
-]
+    id: "input-demo",
+    label: "Interactive input() + Loop",
+    description: "Uses Stdin tab or browser prompt",
+    stdin: "Dara\n3",
+    files: [
+      {
+        name: "main.py",
+        content: `name = input("Enter your name: ")
+times = int(input("How many cheers? "))
 
-def honor_label(student):
-    if student["score"] >= 85:
-        status = "Honor"
-    else:
-        status = "Pass"
-    return f"{student['name']}: {student['score']} ({status})"
-
-for s in students:
-    print(honor_label(s))`,
-  },
-  {
-    id: "exceptions",
-    label: "Function + Try / Except",
-    summary: "Handle runtime errors gracefully instead of crashing.",
-    code: `def safe_divide(a, b):
-    try:
-        return a / b
-    except ZeroDivisionError:
-        return "Cannot divide by zero!"
-
-print("10 / 2 =", safe_divide(10, 2))
-print("10 / 0 =", safe_divide(10, 0))`,
-  },
-  {
-    id: "oop",
-    label: "OOP Class & Inheritance",
-    summary: "Create classes with __init__, inheritance, and super().",
-    code: `class Animal:
-    def __init__(self, name):
-        self.name = name
-
-    def speak(self):
-        return f"{self.name} makes a sound"
-
-class Dog(Animal):
-    def __init__(self, name, breed):
-        super().__init__(name)
-        self.breed = breed
-
-    def speak(self):
-        return f"{self.name} ({self.breed}) says Woof!"
-
-pet = Dog("Milo", "Corgi")
-print(pet.speak())
-print("Is Animal?", isinstance(pet, Animal))`,
-  },
-  {
-    id: "input",
-    label: "Interactive input()",
-    summary: "Simulate user prompts using comma-separated test inputs.",
-    inputs: ["Dara", "20"],
-    code: `name = input("Your name: ")
-age = int(input("Your age: "))
-print(f"Welcome {name}! Next year you will be {age + 1}.")`,
-  },
-  {
-    id: "blank",
-    label: "Blank Canvas",
-    summary: "Start from an empty Python file.",
-    code: `# Write any Python code below and click Run (or press Cmd/Ctrl + Enter)
-print("Ready to experiment!")`,
+for i in range(1, times + 1):
+    print(f"#{i}: Keep coding, {name}!")`,
+      },
+    ],
   },
 ];
 
-const SUPPORTED_ITEMS = [
-  "print() & input()",
-  "f-strings",
-  "if / elif / else",
-  "for & while",
-  "list & dict comprehensions",
-  "def & return",
-  "try / except",
-  "class / __init__ / super()",
-  "len / range / sum / min / max",
-  "sorted / enumerate / zip / isinstance",
-];
+type OutputTab = "console" | "stdin" | "variables";
 
 export function ScratchpadWorkspace() {
-  const [selectedPresetId, setSelectedPresetId] = useState(
-    SCRATCHPAD_PRESETS[0].id
+  const [workspace, setWorkspace] = useState<IdeWorkspaceState>(() =>
+    createEmptyWorkspace()
   );
-  const [initialCode, setInitialCode] = useState(SCRATCHPAD_PRESETS[0].code);
-  const [presetInputs, setPresetInputs] = useState<string[] | undefined>(
-    SCRATCHPAD_PRESETS[0].inputs
-  );
-  const [editorVersion, setEditorVersion] = useState(0);
-  const [isCustomDraft, setIsCustomDraft] = useState(false);
+  const [cursor, setCursor] = useState({ line: 1, col: 1 });
+  const [engineStatus, setEngineStatus] = useState<IdeEngineStatus>("loading");
+  const [pythonVersion, setPythonVersion] = useState("3.12");
+  const [isRunning, setIsRunning] = useState(false);
+  const [runResult, setRunResult] = useState<IdeRunResult | null>(null);
+  const [outputTab, setOutputTab] = useState<OutputTab>("console");
+  const [copied, setCopied] = useState(false);
+  const [isAddingFile, setIsAddingFile] = useState(false);
+  const [newFileName, setNewFileName] = useState("");
   const [isDark, setIsDark] = useState(false);
   const [lastSlide, setLastSlide] = useState<number | null>(null);
 
-  // Sync theme, remembered slide number, and any saved custom draft cleanly after hydration
+  const activeFileObj =
+    workspace.files.find((f) => f.name === workspace.activeFile) ??
+    workspace.files[0];
+
+  const loadPyodideEngine = useCallback(() => {
+    setEngineStatus("loading");
+    ensurePyodideLoaded()
+      .then(({ pythonVersion: ver }) => {
+        setPythonVersion(ver);
+        setEngineStatus("ready");
+      })
+      .catch(() => {
+        setEngineStatus("fallback");
+      });
+  }, []);
+
+  // Hydrate theme, remembered slide, saved workspace, and warm up Pyodide
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
       const storedTheme = readStoredTheme();
@@ -192,17 +207,38 @@ export function ScratchpadWorkspace() {
         setLastSlide(savedSlide);
       }
 
-      const savedDraft = readScratchpadDraft();
-      if (savedDraft !== null && savedDraft !== SCRATCHPAD_PRESETS[0].code) {
-        setSelectedPresetId("custom");
-        setInitialCode(savedDraft);
-        setPresetInputs(undefined);
-        setIsCustomDraft(true);
-        setEditorVersion((v) => v + 1);
+      const savedWorkspace = readIdeWorkspace();
+      if (savedWorkspace) {
+        setWorkspace(savedWorkspace);
+      }
+
+      if (isPyodideReady()) {
+        setEngineStatus("ready");
+      } else {
+        ensurePyodideLoaded()
+          .then(({ pythonVersion: ver }) => {
+            setPythonVersion(ver);
+            setEngineStatus("ready");
+          })
+          .catch(() => {
+            setEngineStatus("fallback");
+          });
       }
     });
+
     return () => cancelAnimationFrame(raf);
   }, []);
+
+  const updateWorkspace = useCallback(
+    (updater: (prev: IdeWorkspaceState) => IdeWorkspaceState) => {
+      setWorkspace((prev) => {
+        const next = updater(prev);
+        saveIdeWorkspace(next);
+        return next;
+      });
+    },
+    []
+  );
 
   const toggleTheme = useCallback(() => {
     setIsDark((prev) => {
@@ -213,7 +249,6 @@ export function ScratchpadWorkspace() {
     });
   }, []);
 
-  // Keyboard shortcut: T toggles theme outside text inputs
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -231,32 +266,134 @@ export function ScratchpadWorkspace() {
         toggleTheme();
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [toggleTheme]);
 
-  const loadPreset = (preset: ScratchpadPreset) => {
-    setSelectedPresetId(preset.id);
-    setInitialCode(preset.code);
-    setPresetInputs(preset.inputs);
-    setIsCustomDraft(false);
-    saveScratchpadDraft(null);
-    setEditorVersion((v) => v + 1);
+  const handleRun = useCallback(async () => {
+    if (isRunning) return;
+    setIsRunning(true);
+    setOutputTab("console");
+    try {
+      const res = await runIdePython({
+        files: workspace.files,
+        entryFile: activeFileObj.name,
+        stdinText: workspace.stdin,
+      });
+      setRunResult(res);
+      if (res.engine === "pyodide") {
+        setPythonVersion(res.pythonVersion);
+        setEngineStatus("ready");
+      } else {
+        setEngineStatus("fallback");
+      }
+    } finally {
+      setIsRunning(false);
+    }
+  }, [isRunning, workspace.files, workspace.stdin, activeFileObj.name]);
+
+  const handleCreateFile = () => {
+    const trimmed = newFileName.trim().replace(/[\\/\s]+/g, "_");
+    if (!trimmed) {
+      setIsAddingFile(false);
+      setNewFileName("");
+      return;
+    }
+    const normalized = trimmed.endsWith(".py") ? trimmed : `${trimmed}.py`;
+    if (workspace.files.some((f) => f.name === normalized)) {
+      updateWorkspace((prev) => ({ ...prev, activeFile: normalized }));
+      setIsAddingFile(false);
+      setNewFileName("");
+      return;
+    }
+    updateWorkspace((prev) => ({
+      ...prev,
+      files: [...prev.files, { name: normalized, content: "" }],
+      activeFile: normalized,
+    }));
+    setCursor({ line: 1, col: 1 });
+    setRunResult(null);
+    setIsAddingFile(false);
+    setNewFileName("");
   };
 
-  const handleCodeChange = (nextCode: string) => {
-    if (nextCode === initialCode) return;
-    setIsCustomDraft(true);
-    saveScratchpadDraft(nextCode);
+  const handleDeleteFile = (name: string) => {
+    if (workspace.files.length <= 1) return;
+    updateWorkspace((prev) => {
+      const remaining = prev.files.filter((f) => f.name !== name);
+      const nextActive =
+        prev.activeFile === name ? remaining[0].name : prev.activeFile;
+      return {
+        ...prev,
+        files: remaining,
+        activeFile: nextActive,
+      };
+    });
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(activeFileObj.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Ignore restricted clipboard environments
+    }
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([activeFileObj.content], {
+      type: "text/x-python;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = activeFileObj.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleClearFile = () => {
+    updateWorkspace((prev) => ({
+      ...prev,
+      files: prev.files.map((f) =>
+        f.name === activeFileObj.name ? { ...f, content: "" } : f
+      ),
+    }));
+    setCursor({ line: 1, col: 1 });
+    setRunResult(null);
+  };
+
+  const handleResetWorkspace = () => {
+    const empty = createEmptyWorkspace();
+    setWorkspace(empty);
+    saveIdeWorkspace(null);
+    setCursor({ line: 1, col: 1 });
+    setRunResult(null);
+  };
+
+  const handleLoadExample = (example: IdeExample) => {
+    updateWorkspace(() => ({
+      files: example.files.map((f) => ({ ...f })),
+      activeFile: example.files[0].name,
+      stdin: example.stdin ?? "",
+    }));
+    setCursor({ line: 1, col: 1 });
+    setRunResult(null);
+    setOutputTab("console");
   };
 
   const backHref = lastSlide ? `/#slide-${lastSlide}` : "/";
+  const stdinLineCount = workspace.stdin.trim()
+    ? workspace.stdin.replace(/\r\n/g, "\n").split("\n").length
+    : 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      {/* Clean Navigation Header matching SlideDeck */}
-      <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
+      {/* Minimal Top Navigation Bar */}
+      <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex h-13 max-w-7xl items-center justify-between gap-4 px-4">
           <div className="flex items-center gap-2 min-w-0">
             <Link
@@ -278,7 +415,7 @@ export function ScratchpadWorkspace() {
 
             <div className="flex items-center gap-1.5 rounded-md bg-blue-500/10 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300">
               <Code2 className="size-3.5 shrink-0" />
-              <span className="truncate">Live Python Scratchpad</span>
+              <span className="truncate">Python IDE Scratchpad</span>
             </div>
           </div>
 
@@ -313,135 +450,484 @@ export function ScratchpadWorkspace() {
         </div>
       </header>
 
-      {/* Main Dedicated Scratchpad Stage */}
-      <main className="bg-dot-stage flex-1 px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mx-auto max-w-7xl space-y-6">
-          {/* Page Intro */}
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  Live Python Scratchpad
-                </h1>
-                {isCustomDraft && (
-                  <Badge variant="secondary" className="text-[11px] font-medium">
-                    Draft Saved
-                  </Badge>
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground max-w-2xl">
-                Answer &ldquo;What if...&rdquo; questions live, explore course
-                examples side-by-side, or test Python snippets right in your
-                browser.
-              </p>
+      {/* Full IDE Workbench Container */}
+      <main className="bg-dot-stage flex-1 flex flex-col p-3 sm:p-4 lg:p-5">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm">
+          {/* File Tabs & Action Toolbar */}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/45 px-2.5 py-2">
+            {/* Multi-file Tabs */}
+            <div className="flex flex-wrap items-center gap-1 min-w-0">
+              {workspace.files.map((file) => {
+                const isActive = file.name === activeFileObj.name;
+                return (
+                  <div
+                    key={file.name}
+                    className={cn(
+                      "group flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-mono transition-colors",
+                      isActive
+                        ? "border-border bg-background font-semibold text-foreground shadow-2xs"
+                        : "border-transparent text-muted-foreground hover:bg-background/60 hover:text-foreground"
+                    )}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateWorkspace((prev) => ({
+                          ...prev,
+                          activeFile: file.name,
+                        }));
+                        setCursor({ line: 1, col: 1 });
+                      }}
+                      className="flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <FileCode2
+                        className={cn(
+                          "size-3.5 shrink-0",
+                          isActive
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-muted-foreground"
+                        )}
+                      />
+                      <span>{file.name}</span>
+                    </button>
+                    {workspace.files.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteFile(file.name)}
+                        aria-label={`Close ${file.name}`}
+                        className="rounded p-0.5 text-muted-foreground/70 hover:bg-muted hover:text-foreground cursor-pointer"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+
+              {isAddingFile ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleCreateFile();
+                  }}
+                  className="flex items-center gap-1"
+                >
+                  <input
+                    type="text"
+                    autoFocus
+                    value={newFileName}
+                    onChange={(e) => setNewFileName(e.target.value)}
+                    onBlur={handleCreateFile}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        setIsAddingFile(false);
+                        setNewFileName("");
+                      }
+                    }}
+                    placeholder="module.py"
+                    aria-label="New Python file name"
+                    className="h-7 w-28 rounded-md border border-primary/50 bg-background px-2 font-mono text-xs outline-none"
+                  />
+                </form>
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={() => setIsAddingFile(true)}
+                  title="Create another .py file (can be imported)"
+                >
+                  <Plus />
+                  <span>New File</span>
+                </Button>
+              )}
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Right Toolbar Actions */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button type="button" variant="outline" size="xs" />
+                  }
+                >
+                  <Sparkles className="text-amber-500" />
+                  <span>Examples</span>
+                  <ChevronDown />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-72">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Insert Optional Example</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {OPTIONAL_EXAMPLES.map((ex) => (
+                      <DropdownMenuItem
+                        key={ex.id}
+                        onClick={() => handleLoadExample(ex)}
+                        className="flex-col items-start gap-0.5 cursor-pointer"
+                      >
+                        <span className="font-medium text-xs">{ex.label}</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {ex.description}
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Button
                 type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  loadPreset(SCRATCHPAD_PRESETS[SCRATCHPAD_PRESETS.length - 1])
-                }
+                variant="ghost"
+                size="xs"
+                onClick={handleCopy}
+                title="Copy current file"
+              >
+                {copied ? <Check className="text-emerald-500" /> : <Copy />}
+                <span className="hidden sm:inline">
+                  {copied ? "Copied" : "Copy"}
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                onClick={handleDownload}
+                title={`Download ${activeFileObj.name}`}
+              >
+                <Download />
+                <span className="hidden md:inline">Save .py</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                onClick={handleClearFile}
+                title="Clear current file"
               >
                 <Eraser />
-                Clear / Blank File
+                <span className="hidden sm:inline">Clear</span>
+              </Button>
+
+              {workspace.files.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={handleResetWorkspace}
+                  title="Reset workspace to empty main.py"
+                >
+                  <RotateCcw />
+                </Button>
+              )}
+
+              <Button
+                type="button"
+                size="xs"
+                onClick={handleRun}
+                disabled={isRunning}
+                className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              >
+                {isRunning ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <Play className="fill-current" />
+                )}
+                <span>
+                  {isRunning ? "Running..." : `Run ${activeFileObj.name}`}
+                </span>
               </Button>
             </div>
           </div>
 
-          {/* Two-Column Workspace Grid */}
-          <div className="grid gap-6 lg:grid-cols-12 items-start">
-            {/* Primary Code Editor & Console */}
-            <div className="lg:col-span-8 space-y-3">
-              <CodePlayground
-                key={`scratchpad-page-${editorVersion}`}
-                title="scratchpad.py"
-                initialCode={initialCode}
-                presetInputs={presetInputs}
-                autoRun={selectedPresetId !== "blank" && !isCustomDraft}
-                size="workspace"
-                onCodeChange={handleCodeChange}
+          {/* Split IDE Editor + Integrated Console/Stdin/Variables */}
+          <div className="flex flex-1 flex-col lg:flex-row min-h-[540px]">
+            {/* Left: Python Code Editor */}
+            <div className="flex flex-1 flex-col min-h-[340px] lg:min-h-0 border-b lg:border-b-0 lg:border-r border-border">
+              <PythonIdeEditor
+                value={activeFileObj.content}
+                onChange={(nextContent) => {
+                  updateWorkspace((prev) => ({
+                    ...prev,
+                    files: prev.files.map((f) =>
+                      f.name === activeFileObj.name
+                        ? { ...f, content: nextContent }
+                        : f
+                    ),
+                  }));
+                }}
+                onRun={handleRun}
+                onCursorChange={setCursor}
+                activeLine={cursor.line}
+                errorLine={runResult?.errorLine ?? null}
               />
-
-              <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-xs text-muted-foreground">
-                <span>
-                  Tip: Press{" "}
-                  <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
-                    Ctrl / ⌘ + Enter
-                  </kbd>{" "}
-                  to run, or{" "}
-                  <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
-                    Tab
-                  </kbd>{" "}
-                  to indent 4 spaces.
-                </span>
-                <span>Your edits auto-save locally in this browser.</span>
-              </div>
             </div>
 
-            {/* Sidebar: Starter Templates & Quick Reference */}
-            <aside className="lg:col-span-4 space-y-4">
-              <Card className="gap-3 p-4 shadow-xs border-border/80">
-                <div className="flex items-center gap-2 border-b pb-2.5">
-                  <Sparkles className="size-4 text-amber-500" />
-                  <h2 className="text-sm font-semibold">Starter Templates</h2>
+            {/* Right: Integrated Output / Stdin / Variables Inspector */}
+            <div className="flex w-full lg:w-[42%] flex-col min-h-[260px] lg:min-h-0 bg-muted/15">
+              {/* Panel Tabs Bar */}
+              <div className="flex items-center justify-between gap-2 border-b bg-muted/35 px-3 py-1.5">
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setOutputTab("console")}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                      outputTab === "console"
+                        ? "bg-background text-foreground shadow-2xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Terminal className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Console</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setOutputTab("stdin")}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                      outputTab === "stdin"
+                        ? "bg-background text-foreground shadow-2xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <span>Stdin</span>
+                    {stdinLineCount > 0 && (
+                      <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+                        {stdinLineCount}
+                      </Badge>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setOutputTab("variables")}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                      outputTab === "variables"
+                        ? "bg-background text-foreground shadow-2xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Variable className="size-3.5 text-blue-600 dark:text-blue-400" />
+                    <span>Variables</span>
+                    {runResult && runResult.variables.length > 0 && (
+                      <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+                        {runResult.variables.length}
+                      </Badge>
+                    )}
+                  </button>
                 </div>
 
-                <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1">
-                  {SCRATCHPAD_PRESETS.map((preset) => {
-                    const active =
-                      !isCustomDraft && selectedPresetId === preset.id;
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() => loadPreset(preset)}
+                <div className="flex items-center gap-2 text-[11px]">
+                  {runResult && (
+                    <>
+                      <span className="font-mono text-muted-foreground">
+                        {runResult.durationMs} ms
+                      </span>
+                      <span
                         className={cn(
-                          "w-full rounded-lg border px-3 py-2 text-left transition-colors cursor-pointer",
-                          active
-                            ? "border-primary/50 bg-primary/8 text-foreground"
-                            : "border-transparent bg-muted/40 hover:bg-muted text-foreground/90"
+                          "font-medium",
+                          runResult.ok
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-rose-600 dark:text-rose-400"
                         )}
                       >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-semibold">
-                            {preset.label}
-                          </span>
-                          {active && (
-                            <span className="size-1.5 rounded-full bg-primary shrink-0" />
-                          )}
-                        </div>
-                        <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-                          {preset.summary}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </Card>
-
-              <Card className="gap-3 p-4 shadow-xs border-border/80">
-                <div className="flex items-center gap-2 border-b pb-2.5">
-                  <BookOpen className="size-4 text-blue-600 dark:text-blue-400" />
-                  <h2 className="text-sm font-semibold">
-                    Supported Python Syntax
-                  </h2>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {SUPPORTED_ITEMS.map((item) => (
-                    <Badge
-                      key={item}
-                      variant="secondary"
-                      className="font-mono text-[11px] font-normal"
+                        {runResult.ok ? "Exited 0" : "Error"}
+                      </span>
+                    </>
+                  )}
+                  {outputTab === "console" && runResult && (
+                    <button
+                      type="button"
+                      onClick={() => setRunResult(null)}
+                      title="Clear console output"
+                      className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
                     >
-                      {item}
-                    </Badge>
-                  ))}
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  )}
                 </div>
-              </Card>
-            </aside>
+              </div>
+
+              {/* Panel Body */}
+              {outputTab === "console" && (
+                <div className="flex-1 overflow-auto bg-slate-950 p-4 font-mono text-[13px] leading-5 text-slate-100">
+                  {!runResult ? (
+                    <div className="space-y-2 text-slate-400 text-xs leading-relaxed">
+                      <p className="text-slate-300 font-medium">
+                        Ready to run your Python code.
+                      </p>
+                      <p>
+                        Write any Python 3 code in{" "}
+                        <code className="rounded bg-slate-800 px-1 py-0.5 text-slate-200">
+                          {activeFileObj.name}
+                        </code>{" "}
+                        and press{" "}
+                        <kbd className="rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-200">
+                          Ctrl / ⌘ + Enter
+                        </kbd>{" "}
+                        or{" "}
+                        <kbd className="rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-200">
+                          F5
+                        </kbd>
+                        .
+                      </p>
+                      <p>
+                        Supports full standard library imports, multi-file tabs,
+                        classes, lambdas, comprehensions, and{" "}
+                        <code className="rounded bg-slate-800 px-1 py-0.5 text-slate-200">
+                          input()
+                        </code>
+                        .
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {runResult.stdout ? (
+                        <pre className="whitespace-pre-wrap break-words text-emerald-300">
+                          {runResult.stdout}
+                        </pre>
+                      ) : runResult.ok ? (
+                        <span className="italic text-slate-500">
+                          (Program finished with no printed output)
+                        </span>
+                      ) : null}
+
+                      {runResult.stderr && (
+                        <div className="rounded-lg border border-rose-500/35 bg-rose-950/60 p-3 text-rose-200">
+                          <div className="mb-1.5 flex items-center justify-between gap-2 text-xs font-semibold text-rose-300">
+                            <span className="inline-flex items-center gap-1.5">
+                              <AlertTriangle className="size-3.5 text-rose-400" />
+                              Traceback / Error
+                            </span>
+                            {runResult.errorLine && (
+                              <span className="rounded bg-rose-500/20 px-1.5 py-0.5 font-mono text-[11px]">
+                                Line {runResult.errorLine}
+                              </span>
+                            )}
+                          </div>
+                          <pre className="whitespace-pre-wrap break-words text-xs leading-5">
+                            {runResult.stderr}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {outputTab === "stdin" && (
+                <div className="flex flex-1 flex-col gap-2.5 p-4">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Optional pre-filled answers for{" "}
+                    <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">
+                      input()
+                    </code>{" "}
+                    (one line per prompt). Leave empty to answer{" "}
+                    <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">
+                      input()
+                    </code>{" "}
+                    interactively via a browser prompt when running.
+                  </p>
+                  <textarea
+                    value={workspace.stdin}
+                    onChange={(e) => {
+                      const nextStdin = e.target.value;
+                      updateWorkspace((prev) => ({ ...prev, stdin: nextStdin }));
+                    }}
+                    placeholder={"Example:\nAda Lovelace\n42"}
+                    spellCheck={false}
+                    aria-label="Standard input lines for Python input()"
+                    className="flex-1 min-h-[160px] w-full resize-none rounded-lg border bg-background p-3 font-mono text-xs leading-5 outline-none focus:border-primary"
+                  />
+                </div>
+              )}
+
+              {outputTab === "variables" && (
+                <div className="flex-1 overflow-auto p-3">
+                  {!runResult ? (
+                    <p className="p-2 text-xs text-muted-foreground">
+                      Run your code to inspect global variables and types.
+                    </p>
+                  ) : runResult.variables.length === 0 ? (
+                    <p className="p-2 text-xs text-muted-foreground">
+                      No top-level variables defined in the last run.
+                    </p>
+                  ) : (
+                    <div className="overflow-hidden rounded-lg border bg-background">
+                      <table className="w-full text-left text-xs">
+                        <thead className="border-b bg-muted/50 text-[11px] font-semibold text-muted-foreground">
+                          <tr>
+                            <th className="px-3 py-2">Name</th>
+                            <th className="px-3 py-2">Type</th>
+                            <th className="px-3 py-2">Value</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y font-mono text-[12px]">
+                          {runResult.variables.map((v) => (
+                            <tr key={v.name} className="hover:bg-muted/30">
+                              <td className="px-3 py-1.5 font-semibold text-foreground">
+                                {v.name}
+                              </td>
+                              <td className="px-3 py-1.5 text-sky-700 dark:text-sky-300">
+                                {v.typeName}
+                              </td>
+                              <td className="px-3 py-1.5 break-all text-muted-foreground">
+                                {v.value}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* IDE Status Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t bg-muted/45 px-3 py-1.5 text-[11px] font-mono text-muted-foreground">
+            <div className="flex items-center gap-3">
+              {engineStatus === "ready" && (
+                <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-medium">
+                  <span className="size-2 rounded-full bg-emerald-500" />
+                  Python {pythonVersion} (CPython Wasm)
+                </span>
+              )}
+              {engineStatus === "loading" && (
+                <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
+                  <Loader2 className="size-3 animate-spin" />
+                  Loading Python 3.12 runtime...
+                </span>
+              )}
+              {engineStatus === "fallback" && (
+                <span className="inline-flex items-center gap-2 text-sky-700 dark:text-sky-300">
+                  <span className="size-2 rounded-full bg-sky-500" />
+                  <span>Offline Fallback Engine</span>
+                  <button
+                    type="button"
+                    onClick={loadPyodideEngine}
+                    className="underline hover:text-foreground cursor-pointer"
+                  >
+                    Retry Wasm
+                  </button>
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <span>{activeFileObj.name}</span>
+              <span>
+                Ln {cursor.line}, Col {cursor.col}
+              </span>
+              <span className="hidden sm:inline">Spaces: 4</span>
+              <span className="hidden md:inline">Ctrl/⌘+/ Comment</span>
+              <span className="hidden sm:inline">Ctrl/⌘+Enter Run</span>
+            </div>
           </div>
         </div>
       </main>

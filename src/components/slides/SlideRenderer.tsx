@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -12,7 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CodePlayground } from "@/components/slides/CodePlayground";
 import { CollectionVisual } from "@/components/slides/CollectionVisual";
@@ -112,9 +113,19 @@ export function SlideRenderer({
                   onClick={onStartCourse}
                   className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 px-5"
                 >
-                  Start Lesson 1
+                  Start Course
                   <ArrowRight />
                 </Button>
+                <Link
+                  href="/scratchpad"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "lg" }),
+                    "px-4"
+                  )}
+                >
+                  <Code2 />
+                  Open Python IDE
+                </Link>
                 <span className="text-xs text-muted-foreground">
                   Press <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[11px]">→</kbd> or{" "}
                   <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[11px]">Space</kbd> to advance

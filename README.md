@@ -4,12 +4,12 @@ A modern, clean, interactive presentation deck for teaching and learning Python 
 
 ## Features
 
-- **33 Part-by-Part Slides across 7 Modules (`00` – `06`)**: Welcome, Variables & Types, Logic & Decisions, Loops, Lists & Dicts, Functions & Error Handling, and Object-Oriented Programming (OOP), with interactive syntax breakdowns on key slides.
+- **35 Part-by-Part Slides across 7 Modules (`00` – `06`)**: Welcome & IDE Intro, Variables & Types, Logic & Decisions, Loops, Lists & Dicts, Functions & Error Handling, and Object-Oriented Programming (OOP), with interactive syntax breakdowns on key slides.
 - **Live Editable Python Playground**: Students and teachers can edit and run Python snippets directly on the slides with syntax highlighting, line numbers, Tab indentation, and instant console output.
 - **Step-by-Step Memory Tracer**: Step through code line-by-line while watching variable boxes update live in memory.
 - **Interactive Checkpoints & Practice Labs**: Built-in multiple-choice quizzes with instant explanations and guided coding labs with hints and sample solutions.
 - **Teacher Presenter Notes (`N`)**: Slide-over drawer with time estimates, learning goals, speaking prompts, student questions, and common pitfall alerts.
-- **Live Python Scratchpad (`/scratchpad` or `P`)**: Dedicated standalone sandbox page with starter templates, syntax reference, and auto-saved edits to test student "What if...?" questions live.
+- **Python IDE Scratchpad (`/scratchpad` or `P`)**: Full in-browser Python 3 IDE (`Pyodide` CPython WebAssembly with offline fallback) featuring multi-file tabs, standard library imports, smart indentation, interactive `input()`, and a live Variables inspector.
 - **Classroom Ready**: Light/Dark theme toggle (`T`), Fullscreen (`F`), Slides Overview grid (`O`), URL hash linking (`#slide-12`), and Print / Save PDF export.
 
 ## Getting Started
@@ -26,7 +26,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `←` / `→` / `Space`: Previous / Next slide
 - `O`: Toggle Slides Overview grid
 - `N`: Toggle Teacher Presenter Notes
-- `P`: Open the Live Python Scratchpad page (`/scratchpad`)
+- `P`: Open the Python IDE Scratchpad page (`/scratchpad`)
 - `T`: Toggle Light / Dark theme
 - `F`: Toggle Fullscreen
 
