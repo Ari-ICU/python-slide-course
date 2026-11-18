@@ -163,13 +163,19 @@ import os
 import sys
 import traceback
 
+__ide_payload = json.loads(__ide_payload_json)
+__ide_entry = __ide_payload["entry"]
+__ide_code = __ide_payload["code"]
+__ide_module_names = __ide_payload["moduleNames"]
+__ide_files_map = __ide_payload["filesMap"]
+
 __ide_work_dir = "/home/pyodide"
 if os.path.isdir(__ide_work_dir):
     os.chdir(__ide_work_dir)
     if __ide_work_dir not in sys.path:
         sys.path.insert(0, __ide_work_dir)
 
-for __mod_name in list(__ide_module_names):
+for __mod_name in __ide_module_names:
     if __mod_name in sys.modules:
         del sys.modules[__mod_name]
 
@@ -209,6 +215,14 @@ except BaseException as __exc:
                 __ide_result["error_line"] = int(__tb.tb_lineno)
             __tb = __tb.tb_next
 finally:
+    try:
+        sys.stdout.flush()
+    except Exception:
+        pass
+    try:
+        sys.stderr.flush()
+    except Exception:
+        pass
     for __k, __v in list(__ide_ns.items()):
         if __k.startswith("__"):
             continue
@@ -380,10 +394,15 @@ export async function runIdePython(options: {
     isatty: false,
   });
 
-  pyodide.globals.set("__ide_entry", entryObj?.name ?? "main.py");
-  pyodide.globals.set("__ide_code", entryObj?.content ?? "");
-  pyodide.globals.set("__ide_module_names", moduleNames);
-  pyodide.globals.set("__ide_files_map", filesMapObj);
+  pyodide.globals.set(
+    "__ide_payload_json",
+    JSON.stringify({
+      entry: entryObj?.name ?? "main.py",
+      code: entryObj?.content ?? "",
+      moduleNames,
+      filesMap: filesMapObj,
+    })
+  );
 
   try {
     const rawJson = await pyodide.runPythonAsync(PY_EXEC_HARNESS);
@@ -424,6 +443,8 @@ export async function runIdePython(options: {
     };
   } finally {
     for (const tmp of [
+      "__ide_payload_json",
+      "__ide_payload",
       "__ide_entry",
       "__ide_code",
       "__ide_module_names",
