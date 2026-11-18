@@ -8,6 +8,7 @@ export type AccentTone = "blue" | "amber" | "emerald" | "purple" | "red";
 export type SlideLayout =
   | "hero"
   | "ide-tour"
+  | "real-case"
   | "concept-flow"
   | "split-code"
   | "step-tracer"
@@ -46,6 +47,8 @@ export interface SyntaxPart {
 }
 
 export interface QuizQuestion {
+  caseKey?: string;
+  realCase?: { title: string; text: string };
   prompt: string;
   code: string;
   options: string[];
@@ -75,6 +78,9 @@ export interface SlideData {
   title: string;
   subtitle?: string;
   lead?: string;
+  realCase?: { title: string; text: string };
+  caseKey?: string;
+  nextSlideTitle?: string;
   highlights?: Array<{ icon: "play" | "layers" | "check"; label: string; detail: string }>;
   roadmap?: Array<{ num: string; title: string; desc: string }>;
   analogy?: { title: string; text: string };
@@ -121,7 +127,7 @@ export const MODULES: ModuleInfo[] = [
   { id: "oop", number: "06", title: "OOP & Classes", color: "#0D9488" },
 ];
 
-export const SLIDES: SlideData[] = [
+const BASE_SLIDES: SlideData[] = [
   /* ==================== MODULE 00: WELCOME ==================== */
   {
     id: "welcome",
@@ -267,6 +273,10 @@ print("Total minutes:", hours * 60)`,
     badge: "Module 01 • Part 1 of 5",
     title: "Your First Program: print() & # Comments",
     lead: "Every Python journey starts with two simple tools: `print()` to display output on screen, and `#` comments to leave human-readable notes.",
+    realCase: {
+      title: "Real-World Case: Displaying Messages vs Leaving Developer Notes",
+      text: "Apps regularly separate what users see (like a welcome banner or order total on screen) from private notes teammates leave behind explaining *why* a line exists. `print()` writes visible screen output, while `#` comments are skipped completely when Python runs.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of print()",
       parts: [
@@ -317,6 +327,10 @@ print("Welcome,", "Student")`,
     badge: "Module 01 • Part 2 of 5",
     title: "Variables: Labeled Storage Boxes",
     lead: "A variable gives a clear name to a value in memory so you can reuse or update it later. Think of `=` as 'put inside', NOT math equality.",
+    realCase: {
+      title: "Real-World Case: Tracking a Player Scoreboard",
+      text: "Suppose a game tracks a student's name and current score. Instead of repeating `10` everywhere and losing track when 5 bonus points are earned, you store `10` in a labeled box called `score`, calculate the new total (`10 + 5`), and update that same box to `15`.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of a Variable Assignment",
       parts: [
@@ -360,6 +374,10 @@ print(student_name, "earned", score, "points")`,
     badge: "Module 01 • Part 3 of 5",
     title: "The 4 Core Data Types",
     lead: "Python tracks the *type* of every value so it knows whether `+` means adding numbers or joining words. Use `type(x)` anytime to inspect.",
+    realCase: {
+      title: "Real-World Case: Filling Out a Student Registration Form",
+      text: "A school sign-up form stores different kinds of data: a student's name (text), age (a whole number), GPA (a decimal), and enrollment status (a Yes/No flag). Python labels these `str`, `int`, `float`, and `bool` so it knows which operations make sense.",
+    },
     cards: [
       {
         pill: "str (String)",
@@ -424,6 +442,10 @@ print(is_enrolled, "->", type(is_enrolled))`,
     badge: "Module 01 • Part 4 of 5",
     title: "User Input & Type Conversion",
     lead: "`input()` pauses to ask the user a question — and **always** returns text (`str`). Convert to `int()` or `float()` before doing math!",
+    realCase: {
+      title: "Real-World Case: Calculating Age from a Web Sign-Up Form",
+      text: "When someone types `2004` into a birth-year prompt, Python receives raw keyboard text (`\"2004\"`), not a number. Before subtracting `2004` from `2026` to find their age, your code must convert that text into a whole number with `int()`.",
+    },
     syntaxAnatomy: {
       title: "Two-Step Conversion Pattern",
       parts: [
@@ -477,6 +499,10 @@ print("Your age in 2026 is:", age)`,
     badge: "Module 01 • Part 5 of 5",
     title: "Clean Output with f-strings",
     lead: "Instead of gluing strings with `+` and `str()`, use an **f-string** (`f\"...\"`) to drop variables and math cleanly right inside curly braces `{ }`.",
+    realCase: {
+      title: "Real-World Case: Formatting a Store Checkout Receipt",
+      text: "A cash register receipt blends fixed labels (`Item:`, `Total due:`) with live numbers (`Notebook`, `3`, `$13.50`) formatted neatly to two cents. An f-string works like a fill-in-the-blank template where variables go directly inside `{ }`.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of an f-string",
       parts: [
@@ -535,6 +561,10 @@ print(f"20% off single price: \${price * 0.8:.2f}")`,
     badge: "Module 02 • Part 1 of 5",
     title: "Math Operators (+ - * / // % **)",
     lead: "Python works like a smart calculator. Pay special attention to the three division-related operators: `/`, `//`, and `%`.",
+    realCase: {
+      title: "Real-World Case: Sharing Snacks Fairly & Checking Leftovers",
+      text: "Imagine splitting 17 cookies among 5 students. Sometimes you want the exact decimal split (`3.4` with `/`), sometimes you only hand out whole cookies (`3` each with `//`), and sometimes you want to count the leftover cookies (`2` remaining with `%`).",
+    },
     cards: [
       {
         pill: "+   -   *",
@@ -590,6 +620,10 @@ print("Power (2 ** 5):", 2 ** 5)`,
     badge: "Module 02 • Part 2 of 5",
     title: "Comparison Operators (== != > < >= <=)",
     lead: "Comparisons ask Python a Yes/No question and **always** give back a `bool` (`True` or `False`).",
+    realCase: {
+      title: "Real-World Case: Checking Exam Pass Marks & Valid Score Ranges",
+      text: "Before issuing a certificate, a grading portal asks Yes/No questions: Did the student score at least 60? Did they get a perfect 100? Is the entered score safely between 0 and 100? Comparisons turn each rule into `True` or `False`.",
+    },
     cards: [
       {
         pill: "==   !=",
@@ -645,6 +679,10 @@ print("Valid 0..100?", 0 <= exam_score <= 100)`,
     badge: "Module 02 • Part 3 of 5",
     title: "Logical Operators: and, or, not",
     lead: "Combine multiple `True`/`False` checks into one decision — just like everyday English rules.",
+    realCase: {
+      title: "Real-World Case: School Exam Entry & Student Discount Rules",
+      text: "Real decisions often check multiple rules at once. Taking an exam requires BOTH a passing score AND a student ID (`and`). Qualifying for a discount accepts EITHER a student ID OR a scholarship (`or`). Logging in requires that the account is NOT locked (`not`).",
+    },
     columns: [
       {
         title: "and — Both Must Be True",
@@ -705,6 +743,10 @@ print("Can log in?", can_login)`,
     badge: "Module 02 • Part 4 of 5",
     title: "Conditionals: if / elif / else",
     lead: "Python checks conditions top-to-bottom and executes **only the first** matching indented block, then skips the rest.",
+    realCase: {
+      title: "Real-World Case: Assigning a Letter Grade from a Score",
+      text: "Teachers turn a numeric score into a single letter grade by checking tiers from highest to lowest: 90+ gets an A, 80+ gets a B, 70+ gets a C, and anything below needs review. As soon as one tier matches, the remaining checks are skipped.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of an if Statement",
       parts: [
@@ -751,6 +793,10 @@ print("Final grade:", grade)`,
     lead: "Test your understanding part by part before moving on to loops!",
     questions: [
       {
+        realCase: {
+          title: "Sharing Snacks Fairly in a Classroom",
+          text: "Suppose a teacher shares 17 cookies equally among 5 students. Each student receives only whole cookies (no breaking cookies in half), and any remaining cookies stay in the jar. In Python, `//` calculates the whole share per student, while `%` finds the leftovers.",
+        },
         prompt: "What does `total_cookies // student_count` and `%` print?",
         code: `total_cookies = 17
 student_count = 5
@@ -760,6 +806,10 @@ print(total_cookies // student_count, total_cookies % student_count)`,
         explanation: "`17 // 5` is whole division (`3`) and `17 % 5` is the remainder (`2`).",
       },
       {
+        realCase: {
+          title: "Smart Thermostat Comfort Mode",
+          text: "A room thermostat checks temperature rules from top to bottom and picks only the FIRST match: above 30°C triggers Hot, above 20°C (when not above 30°C) triggers Warm, and anything 20°C or cooler triggers Cool.",
+        },
         prompt: "What is printed when `temperature = 25`?",
         code: `temperature = 25
 if temperature > 30:
@@ -773,6 +823,10 @@ else:
         explanation: "`25 > 30` is `False`, so Python checks `elif`: `25 > 20` is `True`, prints `\"Warm\"`, and skips `else`.",
       },
       {
+        realCase: {
+          title: "Restaurant Pickup Display Screen",
+          text: "A kitchen screen highlights an order only when its status equals `\"ready\"`. In Python, `=` stores a value into a variable, `==` compares two values, and every `if` header ends with a colon `:`.",
+        },
         prompt: 'Which line validly checks if `order_status` equals `"ready"`?',
         code: `order_status = "ready"
 # Pick the valid if line:`,
@@ -803,6 +857,10 @@ else:
     badge: "Module 03 • Part 1 of 5",
     title: "Why Loops? Stop Copy-Pasting",
     lead: "Computers excel at repeating tasks accurately. A loop lets 2 lines of code do the work of 1,000.",
+    realCase: {
+      title: "Real-World Case: Sending Daily Course Reminders",
+      text: "Imagine sending a progress check-in for 365 days or welcoming 10,000 new users. Writing one `print()` line per day does not scale—a loop writes the rule once and tells Python how many times to repeat it.",
+    },
     columns: [
       {
         title: "Without a Loop (Repetitive)",
@@ -840,6 +898,10 @@ for number in range(1, 6):
     badge: "Module 03 • Part 2 of 5",
     title: "for Loops & range() Step by Step",
     lead: "A `for` loop repeats once for each value in a sequence. `range(start, stop)` starts at `start` and stops **before** `stop`.",
+    realCase: {
+      title: "Real-World Case: Adding Up Daily Cash Register Totals",
+      text: "Think of adding bills into a cash drawer: start the running `total` at `0`, take each day's number (`1`, `2`, `3`, `4`) one round at a time, and add it onto `total` until the whole range is counted.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of a for Loop",
       parts: [
@@ -878,6 +940,10 @@ print("Done! Sum =", total)`,
     badge: "Module 03 • Part 3 of 5",
     title: "while Loops: Repeat Until False",
     lead: "Use `for` when you know the count or collection. Use `while` when you want to repeat **as long as** a condition remains `True`.",
+    realCase: {
+      title: "Real-World Case: Rocket Launch Countdown Timer",
+      text: "Mission control announces the countdown (`3`, `2`, `1`) repeatedly as long as the timer stays above zero. Each round lowers `count` by 1 until `count > 0` becomes `False`, then launches.",
+    },
     rules: [
       { label: "1. Start Variable", text: "Set a starting value before the loop (`count = 3`)." },
       { label: "2. Check Condition", text: "`while count > 0:` runs the body only if `True`." },
@@ -906,6 +972,10 @@ print("Liftoff!")`,
     badge: "Module 03 • Part 4 of 5",
     title: "Loop Control: break vs continue",
     lead: "Inside any `for` or `while` loop, you have two special steering commands to exit early or skip a turn.",
+    realCase: {
+      title: "Real-World Case: Scanning Packages on a Conveyor Belt",
+      text: "While inspecting packages numbered 1 to 5, if item `#3` is damaged you can skip just that item and continue scanning (`continue`). If you spot the urgent package `#4` you were searching for, you stop the belt immediately (`break`).",
+    },
     columns: [
       {
         title: "break — Stop Loop Completely",
@@ -990,6 +1060,10 @@ for step in range(1, 11):
     badge: "Module 04 • Part 1 of 6",
     title: "Lists: Ordered Collections & Indexing",
     lead: "A list stores multiple items in order inside square brackets `[ ]`. Click any item below to see its **positive** (`0..`) and **negative** (`-1..`) index!",
+    realCase: {
+      title: "Real-World Case: Tracking Items in a Shopping Cart",
+      text: "When order matters—like groceries in a cart or songs in a playlist—storing 10 separate variables is messy. Putting them in one ordered list lets you grab the first item (`[0]`), swap an item, or grab the last item (`[-1]`) anytime.",
+    },
     collectionVisual: {
       kind: "list",
       varName: "fruits",
@@ -1027,6 +1101,10 @@ print("Total items:", len(fruits))`,
     badge: "Module 04 • Part 2 of 6",
     title: "List Methods & Slicing ([start:stop])",
     lead: "Grow or shrink lists with built-in methods (`.append()`, `.pop()`, `.remove()`), and grab sub-lists cleanly with slicing.",
+    realCase: {
+      title: "Real-World Case: Managing a Game High-Score Leaderboard",
+      text: "A live leaderboard needs to append new scores, remove old entries, and show slices like the first three scores or the most recent two without altering the full score history.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of List Slicing",
       parts: [
@@ -1080,6 +1158,10 @@ print("Removed:", removed, "| Now:", scores)`,
     badge: "Module 04 • Part 3 of 6",
     title: "Looping & Filtering Lists Step by Step",
     lead: "In Python, you don't need index numbers just to visit every item — loop directly with `for item in items:`!",
+    realCase: {
+      title: "Real-World Case: Building an Honor-Roll List from Exam Scores",
+      text: "Given a class list of exam scores, a teacher wants a second list containing only scores of 85 or higher. Start with an empty `honors` list, check each score one by one, and keep only the qualifying ones.",
+    },
     rules: [
       { label: "Direct Loop", text: "`for score in scores:` sets `score` to each score one by one automatically." },
       { label: "Filter Pattern", text: "Start with `honors = []`, check `if score >= 85:`, then `.append(score)`." },
@@ -1111,6 +1193,10 @@ print("Honor scores:", honors)`,
     badge: "Module 04 • Part 4 of 6",
     title: "Dictionaries: Key -> Value Pairs",
     lead: "Lists look up values by number (`0, 1, 2`). Dictionaries look up values by meaningful **key name** inside `{ }`. Click any pair below!",
+    realCase: {
+      title: "Real-World Case: Storing a Student Profile Card",
+      text: "On a student ID card, remembering whether `grade` is at position `0` or `1` is error-prone. A dictionary pairs descriptive labels (`\"name\"`, `\"grade\"`, `\"track\"`) directly with their values and safely handles missing fields via `.get()`.",
+    },
     collectionVisual: {
       kind: "dict",
       varName: "student",
@@ -1148,6 +1234,10 @@ print("Updated dict:", student)`,
     badge: "Module 04 • Part 5 of 6",
     title: "Looping Over Dictionaries (.keys, .values, .items)",
     lead: "Dictionaries give you three clean ways to loop: keys only, values only, or `(key, value)` pairs together with `.items()`.",
+    realCase: {
+      title: "Real-World Case: Printing a Café Menu Board & Summing Prices",
+      text: "A café POS system stores drink names paired with prices. To print the full menu board line by line or calculate the sum of all prices, you loop across keys, values, or `(item, price)` pairs together.",
+    },
     syntaxAnatomy: {
       title: "Unpacking Key & Value in a Loop",
       parts: [
@@ -1202,6 +1292,10 @@ print(f"Buy one of each: \${total_all:.2f}")`,
     lead: "Verify indexing, slicing, and dictionary lookup before we move to functions!",
     questions: [
       {
+        realCase: {
+          title: "Grabbing the Second-to-Last Fruit in a Basket",
+          text: "A fruit list holds four items ordered left to right (`apple`, `banana`, `cherry`, `mango`). Negative indexing counts backward from the right end: `-1` is the last item, and `-2` steps one spot left.",
+        },
         prompt: "What does `fruits[-2]` print?",
         code: `fruits = ["apple", "banana", "cherry", "mango"]
 print(fruits[-2])`,
@@ -1210,6 +1304,10 @@ print(fruits[-2])`,
         explanation: "`-1` is the last item (`\"mango\"`), so `-2` steps one left to `\"cherry\"`.",
       },
       {
+        realCase: {
+          title: "Copying a Middle Slice of Test Scores",
+          text: "Suppose you want a sub-list of leaderboard scores `[10, 20, 30, 40]` starting at index `1` and stopping BEFORE index `3`. Slicing `[start:stop]` follows the same rule as `range(1, 3)`—it includes `start` and excludes `stop`.",
+        },
         prompt: "What does `scores[1:3]` return?",
         code: `scores = [10, 20, 30, 40]
 print(scores[1:3])`,
@@ -1218,6 +1316,10 @@ print(scores[1:3])`,
         explanation: "Slicing starts at index `1` (`20`) and stops BEFORE index `3` (`40`), giving `[20, 30]`.",
       },
       {
+        realCase: {
+          title: "Showing a Fallback Role on a Student Profile",
+          text: "A newly created student record only stores `\"name\"` and does not have a `\"role\"` key yet. Using `.get(\"role\", \"Guest\")` safely provides a default fallback instead of crashing with a `KeyError`.",
+        },
         prompt: "What prints when a key is missing with `.get()`?",
         code: `student = {"name": "Sam"}
 print(student.get("role", "Guest"))`,
@@ -1243,6 +1345,10 @@ print(student.get("role", "Guest"))`,
     badge: "Module 05 • Part 1 of 5",
     title: "Functions (def): Anatomy & Calling",
     lead: "A function packages steps under one reusable name. First you **define** it with `def`, then you **call** it with `(...)` whenever needed.",
+    realCase: {
+      title: "Real-World Case: Calculating Store Discounts Without Rewriting Math",
+      text: "Imagine an online store calculating 25% off a $80 jacket and 10% off $120 shoes. Instead of repeating the percentage formula everywhere, you build one reusable discount machine (`apply_discount`) that takes price and percent in and hands the sale price out.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of a Function Definition",
       parts: [
@@ -1292,6 +1398,10 @@ print(f"Shoes sale:  \${shoes_price:.2f}")`,
     badge: "Module 05 • Part 2 of 5",
     title: "return vs print() — The #1 Beginner Trap",
     lead: "`print()` only shows text on screen for humans. `return` sends a real usable value back to your code so you can store or calculate with it.",
+    realCase: {
+      title: "Real-World Case: Calculator Screen vs Passing a Total to Checkout",
+      text: "Showing `7` on a screen (`print()`) lets a human read it, but the rest of your app cannot multiply or tax what was only displayed on screen. A function must `return` its result so later lines can save or reuse that value.",
+    },
     columns: [
       {
         title: "Using print() Inside Function",
@@ -1337,6 +1447,10 @@ print("good_result is:", good_result, "-> * 10 =", good_result * 10)`,
     badge: "Module 05 • Part 3 of 5",
     title: "Default Arguments & Variable Scope",
     lead: "Give optional parameters smart fallback values, and see why variables created inside a `def` stay private to that function.",
+    realCase: {
+      title: "Real-World Case: Course Sign-Up Badges with a Default Role",
+      text: "Most people joining a class are Students while a few are Instructors. Setting `role=\"Student\"` as a default avoids typing `\"Student\"` on every call, while keeping internal helper variables private inside the function.",
+    },
     points: [
       {
         tag: 'role="Student"',
@@ -1381,6 +1495,10 @@ print(greet("Dr. Chen", role="Instructor"))
     badge: "Module 05 • Part 4 of 5",
     title: "Reading Errors & try / except",
     lead: "Programs crash when users enter bad input unless you guard risky lines. Read tracebacks bottom-up, and handle failures cleanly with `try / except`.",
+    realCase: {
+      title: "Real-World Case: Keeping a Division Tool Running on Bad Input",
+      text: "In real apps, users sometimes type text like `\"abc\"` into a number box or enter `0` as a divisor. Instead of crashing the whole program, `try / except` catches those specific mistakes and returns a clear friendly message.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of Error Handling",
       parts: [
@@ -1477,6 +1595,10 @@ print(c_to_f("hot"))`,
     badge: "Module 06 • Part 1 of 5",
     title: "Classes & Objects: Blueprint vs House",
     lead: "Object-Oriented Programming (OOP) bundles data and actions together into your own custom types using `class`.",
+    realCase: {
+      title: "Real-World Case: Designing One Blueprint to Stamp Many Objects",
+      text: "Just like one house blueprint or pet-adoption template defines what every record contains (`name`, `age`, `bark`), a `class` defines the pattern once so you can build many independent `Dog` objects from it.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of Creating a Class & Object",
       parts: [
@@ -1530,6 +1652,10 @@ print(f"{dog2.name} is {dog2.age} years old")`,
     badge: "Module 06 • Part 2 of 5",
     title: "Inside __init__ & self (Line by Line)",
     lead: "`__init__` runs automatically whenever you create an object, and `self` always means **that specific object** being built or updated.",
+    realCase: {
+      title: "Real-World Case: Enrolling Separate Students with Independent Scores",
+      text: "When Ada and Leo both enroll in a course, each student gets their own profile box (`self`). Running `student1.add_bonus(5)` adds 5 points to Ada's record while leaving Leo's score completely untouched.",
+    },
     rules: [
       { label: "1. __init__(self, ...)", text: "The constructor — sets starting fields right when `Student(...)` is called." },
       { label: "2. What is self?", text: "Calling `student1.add_bonus(5)` silently passes `student1` as `self`!" },
@@ -1565,6 +1691,10 @@ print(student1.name, student1.score, "|", student2.name, student2.score)`,
     badge: "Module 06 • Part 3 of 5",
     title: "Instance Methods & __str__",
     lead: "Methods are functions inside a class that read or safely update `self`. Adding `__str__` gives every object a clean human-readable print format!",
+    realCase: {
+      title: "Real-World Case: A Bank Account with Deposits & Readable Statements",
+      text: "A bank account pairs customer data (`owner`, `balance`) with safe actions like `deposit()`. Adding `__str__` turns `print(account)` from a cryptic memory address into a clean account summary line.",
+    },
     syntaxAnatomy: {
       title: "How Method Calls Pass self",
       parts: [
@@ -1625,6 +1755,10 @@ print(account)`,
     badge: "Module 06 • Part 4 of 5",
     title: "Inheritance & super() (Reusing Classes)",
     lead: "Instead of copy-pasting an existing class, create a **child class** that inherits everything from a **parent class** and adds new features.",
+    realCase: {
+      title: "Real-World Case: Extending a Student Record for Honor Students",
+      text: "An Honor Student still has a `name`, a `score`, and a printed summary just like any `Student`, plus an extra `medal` and `badge()`. Inheritance reuses the existing `Student` code instead of duplicating it.",
+    },
     syntaxAnatomy: {
       title: "Anatomy of Class Inheritance",
       parts: [
@@ -1694,6 +1828,10 @@ print("Is student2 a Student?", isinstance(student2, Student))`,
     lead: "Verify your understanding of classes, `self`, methods, and inheritance!",
     questions: [
       {
+        realCase: {
+          title: "Printing Book Copies from a Publisher's Template",
+          text: "A book publisher designs one reusable template describing what every book has (a `title`), then prints individual physical book copies from it. In OOP, the template is the `class`, and each copy you build from it is an object (`instance`).",
+        },
         prompt: "In this code, what is `Book` vs `book1`?",
         code: `class Book:
     def __init__(self, title):
@@ -1710,6 +1848,10 @@ book1 = Book("Python 101")`,
         explanation: "`class Book:` defines the blueprint, and calling `Book(\"Python 101\")` creates a real object stored in `book1`.",
       },
       {
+        realCase: {
+          title: "Personalizing a Greeting for Whichever User Clicked",
+          text: "When many users share the same `greet` method, Python needs to know *which* specific user object triggered the call (`user.greet()` vs `admin.greet()`). The `self` parameter always points to that exact calling object.",
+        },
         prompt: "What does `self` represent inside a method?",
         code: `def greet(self):
     return f"Hi, {self.name}"`,
@@ -1723,6 +1865,10 @@ book1 = Book("Python 101")`,
         explanation: "`self` refers to the exact object on the left of the dot (for `user.greet()`, `self` is `user`).",
       },
       {
+        realCase: {
+          title: "Two Separate Scoreboards in a Two-Player Game",
+          text: "Suppose Player 1 and Player 2 each get their own `Counter` scoreboard starting at `0`. Pressing `+1` twice on Player 1's counter raises only Player 1's count to `2` while Player 2's counter stays `0`.",
+        },
         prompt: "What does this snippet print?",
         code: `class Counter:
     def __init__(self):
@@ -1749,3 +1895,29 @@ print(counter1.count, counter2.count)`,
     },
   },
 ];
+
+export const SLIDES: SlideData[] = BASE_SLIDES.flatMap((slide) => {
+  if (!slide.realCase) return [slide];
+
+  const cleanTitle = slide.realCase.title.replace(/^Real-World Case:\s*/i, "");
+  const caseSlide: SlideData = {
+    id: `${slide.id}-case`,
+    moduleId: slide.moduleId,
+    layout: "real-case",
+    badge: `${slide.badge} • Real Case`,
+    title: cleanTitle,
+    lead: slide.realCase.text,
+    realCase: slide.realCase,
+    caseKey: slide.id,
+    nextSlideTitle: slide.title,
+    notes: {
+      duration: "2 min",
+      goal: `Understand the real-world scenario before coding: ${slide.title}.`,
+      say: slide.realCase.text,
+      ask: `Before looking at Python syntax, how would you solve "${cleanTitle}" in everyday life?`,
+      watchOut: "Connect every value in the interactive visual to the variables shown on the next slide.",
+    },
+  };
+
+  return [caseSlide, slide];
+});

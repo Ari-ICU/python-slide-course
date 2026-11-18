@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   AlertTriangle,
+  BookOpen,
   Check,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Code2,
   Copy,
   Eye,
   Play,
@@ -21,18 +23,21 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { QuizQuestion } from "@/data/slides";
+import { RealCaseSlide } from "@/components/slides/RealCaseSlide";
 import { RichText } from "@/components/slides/RichText";
 import { highlightPythonLine } from "@/lib/py-highlight";
 import { runPython, type PyRunResult } from "@/lib/py-runner";
 import { cn } from "@/lib/utils";
 
 interface QuizBlockProps {
+  quizId?: string;
   questions: QuizQuestion[];
 }
 
-export function QuizBlock({ questions }: QuizBlockProps) {
+export function QuizBlock({ quizId, questions }: QuizBlockProps) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [tabByQuestion, setTabByQuestion] = useState<Record<number, "case" | "question">>({});
   const [attempts, setAttempts] = useState<Record<number, number[]>>({});
   const [revealed, setRevealed] = useState<Record<number, boolean>>({});
   const [runResults, setRunResults] = useState<Record<number, PyRunResult>>({});
@@ -107,6 +112,7 @@ export function QuizBlock({ questions }: QuizBlockProps) {
     setAttempts({});
     setRevealed({});
     setRunResults({});
+    setTabByQuestion({});
     setCopiedIdx(null);
     if (safeIdx !== 0) {
       setDirection(-1);
@@ -122,6 +128,12 @@ export function QuizBlock({ questions }: QuizBlockProps) {
   const runResult = runResults[safeIdx];
   const codeLines = activeQuestion.code.split("\n");
   const isCopied = copiedIdx === safeIdx;
+  const questionCaseKey =
+    activeQuestion.caseKey || (quizId ? `${quizId}-q${safeIdx}` : undefined);
+  const hasRealCase = Boolean(activeQuestion.realCase || questionCaseKey);
+  const activeTab: "case" | "question" = hasRealCase
+    ? tabByQuestion[safeIdx] || "case"
+    : "question";
 
   return (
     <div className="flex flex-col gap-4">
@@ -239,14 +251,105 @@ export function QuizBlock({ questions }: QuizBlockProps) {
                   : "border-border/80"
             )}
           >
-            <div className="grid gap-5 lg:grid-cols-12 lg:items-start">
-              {/* Left Column: Spacious Python Code Panel */}
-              <div className="lg:col-span-6">
+            {hasRealCase && (
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-3">
+                <div className="inline-flex rounded-xl border bg-muted/40 p-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setTabByQuestion((prev) => ({ ...prev, [safeIdx]: "case" }))
+                    }
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
+                      activeTab === "case"
+                        ? "bg-background text-foreground shadow-2xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <BookOpen className="size-3.5 text-sky-600 dark:text-sky-400" />
+                    1. Real-World Case (Live Visual)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setTabByQuestion((prev) => ({
+                        ...prev,
+                        [safeIdx]: "question",
+                      }))
+                    }
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
+                      activeTab === "question"
+                        ? "bg-background text-foreground shadow-2xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Code2 className="size-3.5 text-blue-600 dark:text-blue-400" />
+                    2. Question &amp; Code
+                  </button>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {isMultiQuestion
+                    ? `Question ${safeIdx + 1} of ${questions.length}`
+                    : "Checkpoint Question"}
+                </span>
+              </div>
+            )}
+
+            {activeTab === "case" && questionCaseKey ? (
+              <RealCaseSlide
+                compact
+                caseKey={questionCaseKey}
+                title={activeQuestion.realCase?.title}
+                description={activeQuestion.realCase?.text}
+                nextLabel="Continue to Question & Code"
+                onNextSlide={() =>
+                  setTabByQuestion((prev) => ({
+                    ...prev,
+                    [safeIdx]: "question",
+                  }))
+                }
+              />
+            ) : (
+              <div className="grid gap-5 lg:grid-cols-12 lg:items-start">
+              {/* Left Column: Step 1 Real-World Case -> Step 2 Python Code */}
+              <div className="space-y-3.5 lg:col-span-6">
+                {activeQuestion.realCase && (
+                  <div className="rounded-xl border border-sky-500/30 bg-sky-500/[0.06] px-4 py-3 dark:bg-sky-950/25">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
+                        <BookOpen className="size-3.5 shrink-0" />
+                        <span>Step 1 • Real-World Case</span>
+                      </span>
+                      {questionCaseKey && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setTabByQuestion((prev) => ({
+                              ...prev,
+                              [safeIdx]: "case",
+                            }))
+                          }
+                          className="text-[11px] font-semibold text-sky-700 underline-offset-2 hover:underline dark:text-sky-300 cursor-pointer"
+                        >
+                          Open Live Visual
+                        </button>
+                      )}
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-foreground">
+                      {activeQuestion.realCase.title}
+                    </div>
+                    <p className="mt-1 text-[13px] leading-relaxed text-foreground/85">
+                      <RichText text={activeQuestion.realCase.text} />
+                    </p>
+                  </div>
+                )}
+
                 <div className="overflow-hidden rounded-xl border border-border/80 bg-slate-50/95 shadow-2xs dark:bg-slate-950/85">
                   <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-muted/50 px-3.5 py-2">
                     <span className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                       <span className="size-2 rounded-full bg-blue-500/80" />
-                      python
+                      {activeQuestion.realCase ? "Step 2 • Python Code" : "python"}
                     </span>
 
                     <div className="flex items-center gap-1.5">
@@ -353,6 +456,7 @@ export function QuizBlock({ questions }: QuizBlockProps) {
                   {/* Question Header */}
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <Badge variant="outline" className="font-mono text-xs font-semibold">
+                      {activeQuestion.realCase ? "Step 3 • " : ""}
                       {isMultiQuestion
                         ? `Question ${safeIdx + 1} of ${questions.length}`
                         : "Checkpoint Question"}
@@ -530,6 +634,7 @@ export function QuizBlock({ questions }: QuizBlockProps) {
                 )}
               </div>
             </div>
+            )}
           </Card>
         </motion.div>
       </AnimatePresence>

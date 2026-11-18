@@ -21,6 +21,7 @@ import { CollectionVisual } from "@/components/slides/CollectionVisual";
 import { ExerciseLab } from "@/components/slides/ExerciseLab";
 import { IdeVisualBreakdown } from "@/components/slides/IdeVisualBreakdown";
 import { QuizBlock } from "@/components/slides/QuizBlock";
+import { RealCaseSlide } from "@/components/slides/RealCaseSlide";
 import { RichText } from "@/components/slides/RichText";
 import { StepTracer } from "@/components/slides/StepTracer";
 import { SyntaxAnatomy } from "@/components/slides/SyntaxAnatomy";
@@ -79,6 +80,7 @@ interface SlideRendererProps {
   slide: SlideData;
   onStartCourse?: () => void;
   onJumpModule?: (moduleId: string) => void;
+  onNextSlide?: () => void;
   isPrint?: boolean;
 }
 
@@ -86,6 +88,7 @@ export function SlideRenderer({
   slide,
   onStartCourse,
   onJumpModule,
+  onNextSlide,
   isPrint = false,
 }: SlideRendererProps) {
   if (slide.layout === "hero") {
@@ -219,6 +222,15 @@ export function SlideRenderer({
           </p>
         )}
       </div>
+
+      {/* Layout: real-case */}
+      {slide.layout === "real-case" && (
+        <RealCaseSlide
+          caseKey={slide.caseKey || slide.id}
+          nextSlideTitle={slide.nextSlideTitle}
+          onNextSlide={!isPrint ? onNextSlide : undefined}
+        />
+      )}
 
       {slide.syntaxAnatomy && (
         <SyntaxAnatomy
@@ -511,7 +523,9 @@ export function SlideRenderer({
       )}
 
       {/* Layout: quiz */}
-      {slide.layout === "quiz" && slide.questions && <QuizBlock questions={slide.questions} />}
+      {slide.layout === "quiz" && slide.questions && (
+        <QuizBlock quizId={slide.id} questions={slide.questions} />
+      )}
 
       {/* Layout: exercise */}
       {slide.layout === "exercise" &&

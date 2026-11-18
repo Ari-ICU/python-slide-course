@@ -407,6 +407,7 @@ export function SlideDeck() {
                     slide={slide}
                     onStartCourse={() => goToSlide(1)}
                     onJumpModule={jumpToModule}
+                    onNextSlide={() => goToSlide(currentIdx + 1)}
                   />
                 </motion.div>
               </AnimatePresence>
