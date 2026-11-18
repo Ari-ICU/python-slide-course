@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import {
-  BookOpen,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -38,7 +37,6 @@ import {
 } from "@/components/ui/tooltip";
 import { OverviewDialog } from "@/components/slides/OverviewDialog";
 import { SlideRenderer } from "@/components/slides/SlideRenderer";
-import { TeacherNotesSheet } from "@/components/slides/TeacherNotesSheet";
 import {
   readLastSlideNumber,
   readStoredTheme,
@@ -53,7 +51,6 @@ export function SlideDeck() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [direction, setDirection] = useState(1);
   const [overviewOpen, setOverviewOpen] = useState(false);
-  const [notesOpen, setNotesOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -171,19 +168,16 @@ export function SlideDeck() {
       if (isEditing || e.metaKey || e.ctrlKey || e.altKey) return;
 
       if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
-        if (overviewOpen || notesOpen) return;
+        if (overviewOpen) return;
         e.preventDefault();
         goToSlide(currentIdx + 1);
       } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
-        if (overviewOpen || notesOpen) return;
+        if (overviewOpen) return;
         e.preventDefault();
         goToSlide(currentIdx - 1);
       } else if (e.key === "o" || e.key === "O") {
         e.preventDefault();
         setOverviewOpen((o) => !o);
-      } else if (e.key === "n" || e.key === "N") {
-        e.preventDefault();
-        setNotesOpen((n) => !n);
       } else if (e.key === "p" || e.key === "P") {
         e.preventDefault();
         saveLastSlideNumber(currentIdx + 1);
@@ -203,7 +197,6 @@ export function SlideDeck() {
     currentIdx,
     goToSlide,
     overviewOpen,
-    notesOpen,
     router,
     toggleTheme,
     toggleFullscreen,
@@ -295,25 +288,8 @@ export function SlideDeck() {
               </DropdownMenu>
             </div>
 
-            {/* Right: 4 Quiet Action Controls */}
+            {/* Right: Quiet Action Controls */}
             <div className="flex items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      type="button"
-                      variant={notesOpen ? "secondary" : "ghost"}
-                      size="sm"
-                      onClick={() => setNotesOpen(true)}
-                    />
-                  }
-                >
-                  <BookOpen />
-                  <span className="hidden sm:inline">Notes</span>
-                </TooltipTrigger>
-                <TooltipContent>Teacher Presenter Notes (N)</TooltipContent>
-              </Tooltip>
-
               <Tooltip>
                 <TooltipTrigger
                   render={
@@ -466,9 +442,6 @@ export function SlideDeck() {
               <span className="hidden lg:inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
                 <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px]">← →</kbd>
                 Slide
-                <span className="mx-0.5 opacity-40">•</span>
-                <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px]">N</kbd>
-                Notes
               </span>
               <Button
                 type="button"
@@ -490,14 +463,6 @@ export function SlideDeck() {
           onOpenChange={setOverviewOpen}
           currentIdx={currentIdx}
           onSelectSlide={goToSlide}
-        />
-
-        <TeacherNotesSheet
-          open={notesOpen}
-          onOpenChange={setNotesOpen}
-          slide={slide}
-          slideNumber={currentIdx + 1}
-          totalSlides={SLIDES.length}
         />
       </div>
 
