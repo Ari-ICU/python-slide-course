@@ -33,3 +33,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Customizing Slides
 
 Edit modules, slide content, code demos, quizzes, and teacher notes in [`src/data/slides.ts`](./src/data/slides.ts).
+
+## Deploying with GitHub Pages
+
+This project includes a GitHub Actions workflow at [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) configured for Next.js static export (`output: "export"`).
+
+1. In your GitHub repository, open **Settings → Pages** and set **Source** to **GitHub Actions**.
+2. Push to the `main` branch (or trigger the workflow manually from **Actions → Deploy to GitHub Pages**).
+3. Your slides will deploy to `https://ari-icu.github.io/python-slide-course/`.
