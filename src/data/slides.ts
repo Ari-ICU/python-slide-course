@@ -317,18 +317,33 @@ print("Welcome,", "Student")`,
     badge: "Module 01 • Part 2 of 5",
     title: "Variables: Labeled Storage Boxes",
     lead: "A variable gives a clear name to a value in memory so you can reuse or update it later. Think of `=` as 'put inside', NOT math equality.",
+    syntaxAnatomy: {
+      title: "Anatomy of a Variable Assignment",
+      parts: [
+        { token: "student_name", label: "1. Box Name (Left)", explain: "Always put the variable name on the LEFT side using `snake_case` (lowercase with underscores).", tone: "blue" },
+        { token: "=", label: "2. Store Operator", explain: "Read `=` as 'store inside' (NOT math equals). It puts the right-side value into the left-side box.", tone: "amber" },
+        { token: '"Ada"', label: "3. Value (Right)", explain: "Python evaluates the RIGHT side first, then places the result inside the box.", tone: "emerald" },
+        { token: "score = score + 5", label: "4. Updating a Box", explain: "Take the old `score` (10), add 5 to get 15, then overwrite `score` with 15.", tone: "purple" },
+      ],
+    },
     rules: [
-      { label: "1. Create: name = val", text: "`score = 10` creates a box labeled `score` and puts `10` inside." },
-      { label: "2. Update: right-side first", text: "`score = score + 5` computes `10 + 5` FIRST, then stores `15` back in `score`." },
-      { label: "3. Naming Rules", text: "Use `snake_case` (`user_age`). No spaces, no starting with digits (`1st_name` is invalid)." },
+      { label: "1. Create a Box: name = value", text: "`score = 10` creates a box labeled `score` and puts `10` inside it." },
+      { label: "2. Right Side Runs First", text: "In `score = score + 5`, Python calculates `10 + 5` FIRST (`15`), then stores `15` back into `score`." },
+      { label: "3. Good Names (snake_case)", text: "Use clear, lowercase words joined by `_`: `student_name`, `total_price`, `user_age`." },
+      { label: "4. Illegal Variable Names", text: "No spaces (`user age` ❌), no starting with a number (`1st_place` ❌), and no hyphens (`user-age` ❌)." },
     ],
     tracer: {
       title: "Watch Memory Boxes Change Line by Line",
-      code: `player = "Ada"
+      code: `# 1. Create variables (put values inside boxes)
+student_name = "Ada"
 score = 10
-bonus = 5
-score = score + bonus
-print(player, "has", score, "points")`,
+bonus_points = 5
+
+# 2. Update score (right side runs first: 10 + 5 = 15)
+score = score + bonus_points
+
+# 3. Read values from the boxes
+print(student_name, "earned", score, "points")`,
     },
     notes: {
       duration: "5 min",
@@ -377,14 +392,21 @@ print(player, "has", score, "points")`,
     ],
     codeBlock: {
       title: "Inspect Types Live with type()",
-      code: `name = "Mina"
-age = 20
-gpa = 3.85
+      code: `# 1. Text (str) — always inside matching quotes
+student_name = "Mina"
+
+# 2. Whole number (int) — no decimal point
+student_age = 20
+
+# 3. Decimal number (float) — has a decimal point
+gpa_score = 3.85
+
+# 4. True / False (bool) — capital T or F, no quotes
 is_enrolled = True
 
-print(name, "->", type(name))
-print(age, "->", type(age))
-print(gpa, "->", type(gpa))
+print(student_name, "->", type(student_name))
+print(student_age, "->", type(student_age))
+print(gpa_score, "->", type(gpa_score))
 print(is_enrolled, "->", type(is_enrolled))`,
     },
     notes: {
@@ -431,13 +453,14 @@ print(is_enrolled, "->", type(is_enrolled))`,
     codeBlock: {
       title: "Compare String Joining vs Integer Math",
       presetInputs: ["2004"],
-      code: `raw_year = input("Birth year: ")
-print("As text (type):", type(raw_year))
+      code: `# Step 1: input() ALWAYS gives you text (str)
+birth_year_text = input("Enter birth year: ")
+print("Before int():", birth_year_text, type(birth_year_text))
 
-# Convert text -> integer before subtracting!
-year = int(raw_year)
-age = 2026 - year
-print("Age in 2026:", age)`,
+# Step 2: Convert text -> whole number (int) before math
+birth_year = int(birth_year_text)
+age = 2026 - birth_year
+print("Your age in 2026 is:", age)`,
     },
     notes: {
       duration: "5 min",
@@ -460,7 +483,7 @@ print("Age in 2026:", age)`,
         { token: "f", label: "f Prefix", explain: "Tells Python: replace `{...}` placeholders inside this string.", tone: "blue" },
         { token: '"Hi ', label: "Normal Text", explain: "Regular text stays exactly as typed.", tone: "amber" },
         { token: "{name}", label: "Variable Slot", explain: "Automatically converts any value (int, float, bool) to text!", tone: "emerald" },
-        { token: '${total:.2f}"', label: "Format Spec", explain: "`:.2f` formats a decimal neatly to 2 decimal places (`19.50`).", tone: "purple" },
+        { token: '{total:.2f}"', label: "Format Spec", explain: "`:.2f` formats a decimal neatly to 2 decimal places (`19.50`).", tone: "purple" },
       ],
     },
     points: [
@@ -470,7 +493,7 @@ print("Age in 2026:", age)`,
         desc: "Numbers and booleans inside `{ }` are converted to text automatically.",
       },
       {
-        tag: "{price * qty}",
+        tag: "{price * quantity}",
         title: "Expressions Work Too",
         desc: "You can even put quick math or method calls inside `{ }`.",
       },
@@ -482,14 +505,18 @@ print("Age in 2026:", age)`,
     ],
     codeBlock: {
       title: "Build Clean Messages with f-strings",
-      code: `item = "Notebook"
-price = 4.5
-qty = 3
+      code: `# 1. Store item details in clear variables
+item_name = "Notebook"
+price = 4.50
+quantity = 3
 
-total = price * qty
-print(f"Item: {item} x {qty}")
-print(f"Total due: \${total:.2f}")
-print(f"Next item discount price: \${price * 0.8:.2f}")`,
+# 2. Calculate total cost
+total_cost = price * quantity
+
+# 3. Drop variables directly inside { } with an f-string
+print(f"Item: {item_name} x {quantity}")
+print(f"Total due: \${total_cost:.2f}")
+print(f"20% off single price: \${price * 0.8:.2f}")`,
     },
     notes: {
       duration: "4 min",
@@ -802,7 +829,7 @@ for number in range(1, 6):
       title: "Anatomy of a for Loop",
       parts: [
         { token: "for", label: "Keyword", explain: "Begins a counting/sequence loop.", tone: "purple" },
-        { token: "i", label: "Loop Variable", explain: "Automatically holds the current item (`1`, then `2`, `3`, `4`).", tone: "blue" },
+        { token: "number", label: "Loop Variable", explain: "Automatically holds the current item (`1`, then `2`, `3`, `4`).", tone: "blue" },
         { token: "in range(1, 5)", label: "Sequence", explain: "Generates `1, 2, 3, 4` (`5` is excluded!).", tone: "emerald" },
         { token: ":", label: "Colon + Body", explain: "Indented lines below run once per item.", tone: "amber" },
       ],
@@ -811,13 +838,14 @@ for number in range(1, 6):
       { label: "range(5)", text: "Starts at `0` by default: `0, 1, 2, 3, 4` (5 numbers total)." },
       { label: "range(1, 5)", text: "Includes `1`, stops BEFORE `5`: `1, 2, 3, 4`." },
       { label: "range(0, 10, 2)", text: "3rd value is step size: `0, 2, 4, 6, 8`." },
+      { label: "Accumulator Pattern", text: "`total = total + number` adds each `number` onto `total` (short form: `total += number`)." },
     ],
     tracer: {
       title: "Watch total Accumulate Iteration by Iteration",
       code: `total = 0
-for i in range(1, 5):
-    total += i
-    print("Added", i, "-> total =", total)
+for number in range(1, 5):
+    total = total + number
+    print("Added", number, "-> total =", total)
 print("Done! Sum =", total)`,
     },
     notes: {
@@ -838,14 +866,14 @@ print("Done! Sum =", total)`,
     rules: [
       { label: "1. Start Variable", text: "Set a starting value before the loop (`count = 3`)." },
       { label: "2. Check Condition", text: "`while count > 0:` runs the body only if `True`." },
-      { label: "3. Must Update!", text: "Always update `count -= 1` inside, or the loop runs forever!" },
+      { label: "3. Must Update!", text: "Always update `count = count - 1` inside (short form: `count -= 1`), or the loop runs forever!" },
     ],
     tracer: {
       title: "Trace a Countdown while Loop",
       code: `count = 3
 while count > 0:
     print("T-minus", count)
-    count -= 1
+    count = count - 1
 print("Liftoff!")`,
     },
     notes: {
@@ -868,31 +896,31 @@ print("Liftoff!")`,
         title: "break — Stop Loop Completely",
         tone: "red",
         rule: "Exits immediately",
-        example: "for n in range(1, 6):\n    if n == 4:\n        break\n    print(n)  # prints 1, 2, 3",
+        example: "for number in range(1, 6):\n    if number == 4:\n        break\n    print(number)  # prints 1, 2, 3",
         desc: "Jumps **completely out** of the loop as soon as `break` runs. Remaining numbers (4, 5) never run.",
       },
       {
         title: "continue — Skip Only This Turn",
         tone: "amber",
         rule: "Jumps to next round",
-        example: "for n in range(1, 6):\n    if n == 3:\n        continue\n    print(n)  # prints 1, 2, 4, 5",
+        example: "for number in range(1, 6):\n    if number == 3:\n        continue\n    print(number)  # prints 1, 2, 4, 5",
         desc: "Skips the remaining lines **for this turn only**, then moves right on to the next item.",
       },
     ],
     codeBlock: {
       title: "Compare break & continue Live",
       code: `print("--- Using continue (skip 3) ---")
-for n in range(1, 6):
-    if n == 3:
+for number in range(1, 6):
+    if number == 3:
         continue
-    print(n, end=" ")
+    print(number, end=" ")
 
 print()
 print("--- Using break (stop at 4) ---")
-for n in range(1, 6):
-    if n == 4:
+for number in range(1, 6):
+    if number == 4:
         break
-    print(n, end=" ")`,
+    print(number, end=" ")`,
     },
     notes: {
       duration: "4 min",
@@ -916,20 +944,20 @@ for n in range(1, 6):
 7 x 5 = 35 ★
 ...
 7 x 10 = 70 ★`,
-    starterCode: `num = 7
+    starterCode: `number = 7
 
 # Fix range() to reach 10, then add ★ for multiples of 5!
-for i in range(1, 5):
-    print(f"{num} x {i} = {num * i}")`,
-    hint: "Use `range(1, 11)` so `i` goes up to `10`. Compute `product = num * i`, then check `if product % 5 == 0:`!",
-    solutionCode: `num = 7
+for step in range(1, 5):
+    print(f"{number} x {step} = {number * step}")`,
+    hint: "Use `range(1, 11)` so `step` goes up to `10`. Compute `product = number * step`, then check `if product % 5 == 0:`!",
+    solutionCode: `number = 7
 
-for i in range(1, 11):
-    product = num * i
+for step in range(1, 11):
+    product = number * step
     if product % 5 == 0:
-        print(f"{num} x {i} = {product} ★")
+        print(f"{number} x {step} = {product} ★")
     else:
-        print(f"{num} x {i} = {product}")`,
+        print(f"{number} x {step} = {product}")`,
     notes: {
       duration: "6 min",
       goal: "Let students combine `for`, `range()`, `%`, `if/else`, and `f-strings` in one practical task.",
@@ -1038,8 +1066,8 @@ print("Removed:", removed, "| Now:", scores)`,
     title: "Looping & Filtering Lists Step by Step",
     lead: "In Python, you don't need index numbers just to visit every item — loop directly with `for item in items:`!",
     rules: [
-      { label: "Direct Loop", text: "`for s in scores:` sets `s` to each score one by one automatically." },
-      { label: "Filter Pattern", text: "Start with `honors = []`, check `if s >= 85:`, then `.append(s)`." },
+      { label: "Direct Loop", text: "`for score in scores:` sets `score` to each score one by one automatically." },
+      { label: "Filter Pattern", text: "Start with `honors = []`, check `if score >= 85:`, then `.append(score)`." },
       { label: "Membership (in)", text: "`95 in scores` quickly checks if a value exists (`True`/`False`)." },
     ],
     tracer: {
@@ -1047,9 +1075,9 @@ print("Removed:", removed, "| Now:", scores)`,
       code: `scores = [72, 95, 88, 64]
 honors = []
 
-for s in scores:
-    if s >= 85:
-        honors.append(s)
+for score in scores:
+    if score >= 85:
+        honors.append(score)
 
 print("Honor scores:", honors)`,
     },
@@ -1205,7 +1233,7 @@ print(user.get("role", "Guest"))`,
       parts: [
         { token: "def", label: "Keyword", explain: "Short for *define* — teaches Python a new function.", tone: "purple" },
         { token: "apply_discount", label: "Function Name", explain: "Clear verb name in `snake_case`.", tone: "blue" },
-        { token: "(price, pct)", label: "Parameters", explain: "Input placeholders passed in when calling.", tone: "amber" },
+        { token: "(price, percent)", label: "Parameters", explain: "Input placeholders passed in when calling.", tone: "amber" },
         { token: ":  return ...", label: "Body & Output", explain: "Indented recipe ending with `return` to hand back the answer.", tone: "emerald" },
       ],
     },
@@ -1224,15 +1252,15 @@ print(user.get("role", "Guest"))`,
     ],
     codeBlock: {
       title: "Define Once, Call Multiple Times",
-      code: `def apply_discount(price, pct):
-    saved = price * (pct / 100)
-    return price - saved
+      code: `def apply_discount(price, percent):
+    discount_amount = price * (percent / 100)
+    return price - discount_amount
 
-jacket = apply_discount(80, 25)
-shoes = apply_discount(120, 10)
+jacket_price = apply_discount(80, 25)
+shoes_price = apply_discount(120, 10)
 
-print(f"Jacket sale: \${jacket:.2f}")
-print(f"Shoes sale:  \${shoes:.2f}")`,
+print(f"Jacket sale: \${jacket_price:.2f}")
+print(f"Shoes sale:  \${shoes_price:.2f}")`,
     },
     notes: {
       duration: "5 min",
@@ -1254,15 +1282,15 @@ print(f"Shoes sale:  \${shoes:.2f}")`,
         title: "Using print() Inside Function",
         tone: "red",
         rule: "Hands back None!",
-        example: "def add_bad(a, b):\n    print(a + b)\n\nres = add_bad(3, 4)  # res is None!",
-        desc: "You see `7` on screen, but `res` is empty (`None`). Trying `res * 2` crashes with a `TypeError`!",
+        example: "def add_bad(a, b):\n    print(a + b)\n\nresult = add_bad(3, 4)  # result is None!",
+        desc: "You see `7` on screen, but `result` is empty (`None`). Trying `result * 2` crashes with a `TypeError`!",
       },
       {
         title: "Using return Inside Function",
         tone: "emerald",
         rule: "Sends Value Back!",
-        example: "def add_good(a, b):\n    return a + b\n\nres = add_good(3, 4)  # res is 7",
-        desc: "Now `res` holds the number `7`! You can print it, store it in a list, or multiply `res * 10`.",
+        example: "def add_good(a, b):\n    return a + b\n\nresult = add_good(3, 4)  # result is 7",
+        desc: "Now `result` holds the number `7`! You can print it, store it in a list, or multiply `result * 10`.",
       },
     ],
     codeBlock: {
@@ -1273,11 +1301,11 @@ print(f"Shoes sale:  \${shoes:.2f}")`,
 def add_return(a, b):
     return a + b
 
-x = add_print(3, 4)
-y = add_return(3, 4)
+bad_result = add_print(3, 4)
+good_result = add_return(3, 4)
 
-print("x is:", x)
-print("y is:", y, "-> y * 10 =", y * 10)`,
+print("bad_result is:", bad_result)
+print("good_result is:", good_result, "-> * 10 =", good_result * 10)`,
     },
     notes: {
       duration: "5 min",
@@ -1390,27 +1418,27 @@ print(safe_divide("abc", "2"))`,
     badge: "Module 05 • Part 5 of 5",
     title: "Practice Lab #2: Safe Temperature Converter",
     lead: "Build a clean, crash-proof function using `def`, `return`, `f-strings`, and `try / except`.",
-    task: "Complete `c_to_f(celsius_text)` so it converts `celsius_text` to `float`, calculates `(c * 9 / 5) + 32`, and returns `f\"{c}°C = {f:.1f}°F\"`. Catch `ValueError` if invalid text is given!",
+    task: "Complete `c_to_f(celsius_text)` so it converts `celsius_text` to `float`, calculates `(celsius * 9 / 5) + 32`, and returns `f\"{celsius}°C = {fahrenheit:.1f}°F\"`. Catch `ValueError` if invalid text is given!",
     expectedOutput: `25.0°C = 77.0°F
 0.0°C = 32.0°F
 Invalid temperature!`,
     starterCode: `def c_to_f(celsius_text):
     # Convert celsius_text to float, compute Fahrenheit,
     # and handle ValueError safely!
-    c = float(celsius_text)
-    f = (c * 9 / 5) + 32
-    return f"{c}°C = {f:.1f}°F"
+    celsius = float(celsius_text)
+    fahrenheit = (celsius * 9 / 5) + 32
+    return f"{celsius}°C = {fahrenheit:.1f}°F"
 
 print(c_to_f("25"))
 print(c_to_f("0"))
 # Uncomment line below once try/except is added:
 # print(c_to_f("hot"))`,
-    hint: "Wrap the 3 lines inside `c_to_f` in `try:`, and add `except ValueError: return \"Invalid temperature!\"`.",
+    hint: "Wrap the 3 lines (`celsius = ...`, `fahrenheit = ...`, `return ...`) inside `c_to_f` in `try:`, and add `except ValueError: return \"Invalid temperature!\"`.",
     solutionCode: `def c_to_f(celsius_text):
     try:
-        c = float(celsius_text)
-        f = (c * 9 / 5) + 32
-        return f"{c}°C = {f:.1f}°F"
+        celsius = float(celsius_text)
+        fahrenheit = (celsius * 9 / 5) + 32
+        return f"{celsius}°C = {fahrenheit:.1f}°F"
     except ValueError:
         return "Invalid temperature!"
 
@@ -1489,8 +1517,8 @@ print(f"{dog2.name} is {dog2.age} years old")`,
     lead: "`__init__` runs automatically whenever you create an object, and `self` always means **that specific object** being built or updated.",
     rules: [
       { label: "1. __init__(self, ...)", text: "The constructor — sets starting fields right when `Student(...)` is called." },
-      { label: "2. What is self?", text: "Calling `s1.add_bonus(5)` silently passes `s1` as `self`!" },
-      { label: "3. self.attr = val", text: "Saves data inside *that* object's own memory box." },
+      { label: "2. What is self?", text: "Calling `student1.add_bonus(5)` silently passes `student1` as `self`!" },
+      { label: "3. self.attr = value", text: "Saves data inside *that* object's own memory box." },
     ],
     tracer: {
       title: "Watch Two Student Objects in Memory",
@@ -1499,13 +1527,13 @@ print(f"{dog2.name} is {dog2.age} years old")`,
         self.name = name
         self.score = score
 
-    def add_bonus(self, pts):
-        self.score += pts
+    def add_bonus(self, points):
+        self.score = self.score + points
 
-s1 = Student("Ada", 85)
-s2 = Student("Leo", 92)
-s1.add_bonus(5)
-print(s1.name, s1.score, "|", s2.name, s2.score)`,
+student1 = Student("Ada", 85)
+student2 = Student("Leo", 92)
+student1.add_bonus(5)
+print(student1.name, student1.score, "|", student2.name, student2.score)`,
     },
     notes: {
       duration: "5 min",
@@ -1525,8 +1553,8 @@ print(s1.name, s1.score, "|", s2.name, s2.score)`,
     syntaxAnatomy: {
       title: "How Method Calls Pass self",
       parts: [
-        { token: "acct", label: "Object", explain: "Becomes `self` inside the method!", tone: "blue" },
-        { token: ".", label: "Dot", explain: "Looks up the method on `acct`.", tone: "amber" },
+        { token: "account", label: "Object", explain: "Becomes `self` inside the method!", tone: "blue" },
+        { token: ".", label: "Dot", explain: "Looks up the method on `account`.", tone: "amber" },
         { token: "deposit", label: "Method Name", explain: "Runs `def deposit(self, amount):`.", tone: "purple" },
         { token: "(50)", label: "Argument", explain: "Passed as `amount` (after `self`).", tone: "emerald" },
       ],
@@ -1534,13 +1562,13 @@ print(s1.name, s1.score, "|", s2.name, s2.score)`,
     points: [
       {
         tag: "Update State Safely",
-        title: "acct.withdraw(20)",
+        title: "account.withdraw(20)",
         desc: "Methods can validate rules (like checking balance >= amount) before updating `self.balance`.",
       },
       {
         tag: "def __str__(self):",
         title: "Friendly print(obj)",
-        desc: "Without `__str__`, `print(acct)` shows `<BankAccount object>`. With `__str__`, it prints cleanly!",
+        desc: "Without `__str__`, `print(account)` shows `<BankAccount object>`. With `__str__`, it prints cleanly!",
       },
       {
         tag: "Class Attributes",
@@ -1558,14 +1586,14 @@ print(s1.name, s1.score, "|", s2.name, s2.score)`,
         self.balance = balance
 
     def deposit(self, amount):
-        self.balance += amount
+        self.balance = self.balance + amount
 
     def __str__(self):
         return f"[{self.bank_name}] {self.owner}: \${self.balance:.2f}"
 
-acct = BankAccount("Mina", 100)
-acct.deposit(45)
-print(acct)`,
+account = BankAccount("Mina", 100)
+account.deposit(45)
+print(account)`,
     },
     notes: {
       duration: "5 min",
@@ -1600,39 +1628,39 @@ print(acct)`,
       {
         tag: "super().__init__(...)",
         title: "Extend Without Repeating",
-        desc: "Call `super().__init__(name, avg)` first, then set child-only fields like `self.medal`.",
+        desc: "Call `super().__init__(name, score)` first, then set child-only fields like `self.medal`.",
       },
       {
         tag: "isinstance(obj, Parent)",
         title: "Is-A Relationship",
-        desc: "An `HonorStudent` is ALSO a `Student` (`isinstance(s2, Student)` is `True`).",
+        desc: "An `HonorStudent` is ALSO a `Student` (`isinstance(student2, Student)` is `True`).",
       },
     ],
     codeBlock: {
       title: "Student & HonorStudent Inheritance",
       code: `class Student:
-    def __init__(self, name, avg):
+    def __init__(self, name, score):
         self.name = name
-        self.avg = avg
+        self.score = score
 
     def __str__(self):
-        return f"{self.name} (avg: {self.avg})"
+        return f"{self.name} (score: {self.score})"
 
 class HonorStudent(Student):
-    def __init__(self, name, avg, medal):
-        super().__init__(name, avg)
+    def __init__(self, name, score, medal):
+        super().__init__(name, score)
         self.medal = medal
 
     def badge(self):
         return f"★ {self.name} — {self.medal} Medal"
 
-s1 = Student("Leo", 82)
-s2 = HonorStudent("Mina", 96, "Gold")
+student1 = Student("Leo", 82)
+student2 = HonorStudent("Mina", 96, "Gold")
 
-print(s1)
-print(s2)          # inherited __str__ from Student!
-print(s2.badge())
-print("Is s2 a Student?", isinstance(s2, Student))`,
+print(student1)
+print(student2)          # inherited __str__ from Student!
+print(student2.badge())
+print("Is student2 a Student?", isinstance(student2, Student))`,
     },
     notes: {
       duration: "5 min",
@@ -1651,20 +1679,20 @@ print("Is s2 a Student?", isinstance(s2, Student))`,
     lead: "Verify your understanding of classes, `self`, methods, and inheritance!",
     questions: [
       {
-        prompt: "In this code, what is `Book` vs `b1`?",
+        prompt: "In this code, what is `Book` vs `book1`?",
         code: `class Book:
     def __init__(self, title):
         self.title = title
 
-b1 = Book("Python 101")`,
+book1 = Book("Python 101")`,
         options: [
-          "Book is an object, b1 is a class",
-          "Book is a class (blueprint), b1 is an object (instance)",
+          "Book is an object, book1 is a class",
+          "Book is a class (blueprint), book1 is an object (instance)",
           "Both are lists",
           "Both are strings",
         ],
         answerIndex: 1,
-        explanation: "`class Book:` defines the blueprint, and calling `Book(\"Python 101\")` creates a real object stored in `b1`.",
+        explanation: "`class Book:` defines the blueprint, and calling `Book(\"Python 101\")` creates a real object stored in `book1`.",
       },
       {
         prompt: "What does `self` represent inside a method?",
@@ -1683,18 +1711,18 @@ b1 = Book("Python 101")`,
         prompt: "What does this snippet print?",
         code: `class Counter:
     def __init__(self):
-        self.n = 0
-    def inc(self):
-        self.n += 1
+        self.count = 0
+    def add_one(self):
+        self.count = self.count + 1
 
-a = Counter()
-b = Counter()
-a.inc()
-a.inc()
-print(a.n, b.n)`,
+counter1 = Counter()
+counter2 = Counter()
+counter1.add_one()
+counter1.add_one()
+print(counter1.count, counter2.count)`,
         options: ["2 2", "0 0", "2 0", "1 1"],
         answerIndex: 2,
-        explanation: "`a` and `b` are independent objects! Calling `a.inc()` twice updates `a.n` to `2` while `b.n` stays `0`.",
+        explanation: "`counter1` and `counter2` are independent objects! Calling `counter1.add_one()` twice updates `counter1.count` to `2` while `counter2.count` stays `0`.",
       },
     ],
     notes: {
