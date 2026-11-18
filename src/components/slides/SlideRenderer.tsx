@@ -19,6 +19,7 @@ import { Card } from "@/components/ui/card";
 import { CodePlayground } from "@/components/slides/CodePlayground";
 import { CollectionVisual } from "@/components/slides/CollectionVisual";
 import { ExerciseLab } from "@/components/slides/ExerciseLab";
+import { IdeVisualBreakdown } from "@/components/slides/IdeVisualBreakdown";
 import { QuizBlock } from "@/components/slides/QuizBlock";
 import { RichText } from "@/components/slides/RichText";
 import { StepTracer } from "@/components/slides/StepTracer";
@@ -226,6 +227,9 @@ export function SlideRenderer({
         />
       )}
 
+      {/* Layout: ide-tour */}
+      {slide.layout === "ide-tour" && <IdeVisualBreakdown />}
+
       {/* Layout: concept-flow */}
       {slide.layout === "concept-flow" && (
         <div className="grid gap-5 lg:grid-cols-12">
@@ -396,7 +400,7 @@ export function SlideRenderer({
                               width={28}
                               height={28}
                               unoptimized
-                              className="size-7 object-contain"
+                              className="object-contain"
                             />
                           </div>
                         )}

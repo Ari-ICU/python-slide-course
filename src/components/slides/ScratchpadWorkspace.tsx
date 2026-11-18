@@ -287,10 +287,28 @@ export function ScratchpadWorkspace() {
       } else {
         setEngineStatus("fallback");
       }
+    } catch (err) {
+      setRunResult({
+        ok: false,
+        stdout: "",
+        stderr: err instanceof Error ? err.message : String(err),
+        errorLine: null,
+        durationMs: 1,
+        engine: engineStatus === "fallback" ? "fallback" : "pyodide",
+        pythonVersion,
+        variables: [],
+      });
     } finally {
       setIsRunning(false);
     }
-  }, [isRunning, workspace.files, workspace.stdin, activeFileObj.name]);
+  }, [
+    isRunning,
+    workspace.files,
+    workspace.stdin,
+    activeFileObj.name,
+    engineStatus,
+    pythonVersion,
+  ]);
 
   const handleCreateFile = () => {
     const trimmed = newFileName.trim().replace(/[\\/\s]+/g, "_");

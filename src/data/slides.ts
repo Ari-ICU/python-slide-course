@@ -7,6 +7,7 @@ export type AccentTone = "blue" | "amber" | "emerald" | "purple" | "red";
 
 export type SlideLayout =
   | "hero"
+  | "ide-tour"
   | "concept-flow"
   | "split-code"
   | "step-tracer"
@@ -192,55 +193,16 @@ print("Total minutes:", hours * 60)`,
   {
     id: "what-is-ide",
     moduleId: "intro",
-    layout: "type-cards",
+    layout: "ide-tour",
     badge: "Module 00 • IDE & Core Tools",
     title: "What Is an IDE? (Editor, Terminal & Debugger)",
-    lead: "An **IDE (Integrated Development Environment)** is software for writing and running code. Instead of plain Notepad, it combines a smart editor, Python runner, terminal, and debugger in one window.",
-    syntaxAnatomy: {
-      title: "4 Essential Parts Inside Every Real IDE",
-      parts: [
-        { token: "Code Editor", label: "Write .py Files", explain: "Syntax color highlighting, line numbers, autocomplete, and 4-space auto-indent.", tone: "blue" },
-        { token: "Interpreter", label: "Python Engine", explain: "Runs your `.py` file top to bottom via `python` / `python3`.", tone: "amber" },
-        { token: "Terminal", label: "Console Output", explain: "Displays `print()` output, `input()` prompts, and error tracebacks.", tone: "emerald" },
-        { token: "Debugger", label: "Breakpoints & Vars", explain: "Pause execution on any line and inspect variables step by step.", tone: "purple" },
-      ],
-    },
-    cards: [
-      {
-        pill: ".py Script Files",
-        accent: "blue",
-        example: "main.py  •  utils.py",
-        desc: "Python programs are saved as plain text files ending in `.py`. Larger projects split helpers across files you can `import`.",
-        tip: "Use lowercase names without spaces like `my_app.py`.",
-      },
-      {
-        pill: "Syntax Highlighting",
-        accent: "purple",
-        example: 'def greet():  # comment',
-        desc: "IDEs color keywords, text strings, numbers, and `#` comments differently so typos jump out immediately.",
-        tip: "If text stays one color, check for an unclosed quote!",
-      },
-      {
-        pill: "Auto-Indent (4 Spaces)",
-        accent: "amber",
-        example: 'if score >= 80:\n    print("Pass")',
-        desc: "Python uses **4-space indentation** after a colon `:` to group code blocks. Modern IDEs indent automatically on `Enter`.",
-        tip: "Never mix Tabs and spaces — stick to 4 spaces.",
-      },
-      {
-        pill: "Extensions & Tracebacks",
-        accent: "emerald",
-        example: 'File "main.py", line 3\nNameError: ...',
-        desc: "IDEs install language extensions for autocomplete and show **tracebacks** in the terminal pointing to exact error lines.",
-        tip: "Read tracebacks from the bottom line up!",
-      },
-    ],
+    lead: "An **IDE (Integrated Development Environment)** is your coding studio — it puts file management, a color-coded Python editor, a terminal, and a debugger in one screen. Click any part below to explore how it works.",
     notes: {
       duration: "4 min",
-      goal: "Demystify real IDEs, .py files, syntax highlighting, indentation, extensions, and terminal tracebacks.",
-      say: "Explain that an IDE is to programmers what Microsoft Word + Spellcheck is to writers — it catches typos early and runs code in one click.",
-      ask: "Has anyone opened VS Code, Google Antigravity, or another code editor before?",
-      watchOut: "Remind beginners not to fear red terminal traceback text — it gives the exact file and line number to inspect.",
+      goal: "Make beginners visually recognize the 4 zones inside an IDE (Files, Editor, Terminal, Run/Debugger) before coding.",
+      say: "Walk through zones 1 to 4 right on the mockup window: you organize .py files on the left, write colored/indented code in the center, click Run/Debug at the top, and read output or errors in the Terminal below.",
+      ask: "Which part catches an error line number for you when something breaks — the Editor or the Terminal traceback?",
+      watchOut: "Show the `····` dots on line 4 of the mockup so beginners immediately connect 4-space indentation with the `if ...:` block.",
     },
   },
   {

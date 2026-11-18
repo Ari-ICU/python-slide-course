@@ -90,6 +90,7 @@ function loadScriptOnce(src: string): Promise<void> {
     script.dataset.pyodideSrc = src;
 
     const timer = window.setTimeout(() => {
+      script.remove();
       reject(new Error("Timed out loading Pyodide CDN."));
     }, PYODIDE_LOAD_TIMEOUT_MS);
 
@@ -176,7 +177,9 @@ if os.path.isdir(__ide_work_dir):
         sys.path.insert(0, __ide_work_dir)
 
 for __mod_name in __ide_module_names:
-    if __mod_name in sys.modules:
+    __existing_mod = sys.modules.get(__mod_name)
+    __mod_file = getattr(__existing_mod, "__file__", "") or ""
+    if __existing_mod is not None and __mod_file.startswith(__ide_work_dir):
         del sys.modules[__mod_name]
 
 importlib.invalidate_caches()
@@ -312,99 +315,99 @@ export async function runIdePython(options: {
     );
   }
 
-  const safeFiles = options.files.map((f) => ({
-    name: sanitizeWorkspaceFileName(f.name),
-    content: f.content,
-  }));
-  const safeEntry = sanitizeWorkspaceFileName(options.entryFile);
-  const entryObj = safeFiles.find((f) => f.name === safeEntry) ?? safeFiles[0];
-
-  // Sync workspace files to Pyodide virtual filesystem (/home/pyodide/)
-  const nextPaths = new Set<string>();
-  const moduleNames: string[] = [];
-  const filesMapObj: Record<string, string> = {};
-
-  for (const file of safeFiles) {
-    const fsPath = `/home/pyodide/${file.name}`;
-    nextPaths.add(fsPath);
-    filesMapObj[file.name] = file.content;
-    if (file.name.endsWith(".py")) {
-      moduleNames.push(file.name.slice(0, -3));
-    }
-    pyodide.FS.writeFile(fsPath, file.content, { encoding: "utf8" });
-  }
-
-  for (const prevPath of Array.from(syncedFilePaths)) {
-    if (!nextPaths.has(prevPath)) {
-      try {
-        if (pyodide.FS.analyzePath(prevPath).exists) {
-          pyodide.FS.unlink(prevPath);
-        }
-      } catch {
-        // Ignore cleanup issues
-      }
-    }
-  }
-  syncedFilePaths.clear();
-  for (const p of nextPaths) {
-    syncedFilePaths.add(p);
-  }
-
   let stdout = "";
   let stderr = "";
-  const stdoutDecoder = new TextDecoder("utf-8", { fatal: false });
-  const stderrDecoder = new TextDecoder("utf-8", { fatal: false });
-  const inputQueue = [...stdinLines];
-
-  pyodide.setStdout({
-    write: (buffer) => {
-      stdout += stdoutDecoder.decode(buffer, { stream: true });
-      return buffer.length;
-    },
-  });
-
-  pyodide.setStderr({
-    write: (buffer) => {
-      stderr += stderrDecoder.decode(buffer, { stream: true });
-      return buffer.length;
-    },
-  });
-
-  pyodide.setStdin({
-    stdin: () => {
-      if (inputQueue.length > 0) {
-        const nextLine = inputQueue.shift() ?? "";
-        stdout += `${nextLine}\n`;
-        return nextLine;
-      }
-      const trailingPrompt = stdout.split("\n").pop()?.trim() || "";
-      const promptMsg = trailingPrompt || "Python input():";
-      const response = options.onPrompt
-        ? options.onPrompt(promptMsg)
-        : typeof window !== "undefined"
-          ? window.prompt(promptMsg)
-          : "";
-      if (response === null) {
-        return null;
-      }
-      stdout += `${response}\n`;
-      return response;
-    },
-    autoEOF: true,
-    isatty: false,
-  });
-
-  pyodide.globals.set(
-    "__ide_payload_json",
-    JSON.stringify({
-      entry: entryObj?.name ?? "main.py",
-      code: entryObj?.content ?? "",
-      moduleNames,
-      filesMap: filesMapObj,
-    })
-  );
-
   try {
+    const safeFiles = options.files.map((f) => ({
+      name: sanitizeWorkspaceFileName(f.name),
+      content: f.content,
+    }));
+    const safeEntry = sanitizeWorkspaceFileName(options.entryFile);
+    const entryObj = safeFiles.find((f) => f.name === safeEntry) ?? safeFiles[0];
+
+    // Sync workspace files to Pyodide virtual filesystem (/home/pyodide/)
+    const nextPaths = new Set<string>();
+    const moduleNames: string[] = [];
+    const filesMapObj: Record<string, string> = {};
+
+    for (const file of safeFiles) {
+      const fsPath = `/home/pyodide/${file.name}`;
+      nextPaths.add(fsPath);
+      filesMapObj[file.name] = file.content;
+      if (file.name.endsWith(".py")) {
+        moduleNames.push(file.name.slice(0, -3));
+      }
+      pyodide.FS.writeFile(fsPath, file.content, { encoding: "utf8" });
+    }
+
+    for (const prevPath of Array.from(syncedFilePaths)) {
+      if (!nextPaths.has(prevPath)) {
+        try {
+          if (pyodide.FS.analyzePath(prevPath).exists) {
+            pyodide.FS.unlink(prevPath);
+          }
+        } catch {
+          // Ignore cleanup issues
+        }
+      }
+    }
+    syncedFilePaths.clear();
+    for (const p of nextPaths) {
+      syncedFilePaths.add(p);
+    }
+
+    const stdoutDecoder = new TextDecoder("utf-8", { fatal: false });
+    const stderrDecoder = new TextDecoder("utf-8", { fatal: false });
+    const inputQueue = [...stdinLines];
+
+    pyodide.setStdout({
+      write: (buffer) => {
+        stdout += stdoutDecoder.decode(new Uint8Array(buffer), { stream: true });
+        return buffer.length;
+      },
+    });
+
+    pyodide.setStderr({
+      write: (buffer) => {
+        stderr += stderrDecoder.decode(new Uint8Array(buffer), { stream: true });
+        return buffer.length;
+      },
+    });
+
+    pyodide.setStdin({
+      stdin: () => {
+        if (inputQueue.length > 0) {
+          const nextLine = inputQueue.shift() ?? "";
+          stdout += `${nextLine}\n`;
+          return nextLine;
+        }
+        const trailingPrompt = stdout.split("\n").pop()?.trim() || "";
+        const promptMsg = trailingPrompt || "Python input():";
+        const response = options.onPrompt
+          ? options.onPrompt(promptMsg)
+          : typeof window !== "undefined"
+            ? window.prompt(promptMsg)
+            : "";
+        if (response === null) {
+          return null;
+        }
+        stdout += `${response}\n`;
+        return response;
+      },
+      autoEOF: true,
+      isatty: false,
+    });
+
+    pyodide.globals.set(
+      "__ide_payload_json",
+      JSON.stringify({
+        entry: entryObj?.name ?? "main.py",
+        code: entryObj?.content ?? "",
+        moduleNames,
+        filesMap: filesMapObj,
+      })
+    );
+
     const rawJson = await pyodide.runPythonAsync(PY_EXEC_HARNESS);
     stdout += stdoutDecoder.decode();
     stderr += stderrDecoder.decode();
@@ -454,6 +457,8 @@ export async function runIdePython(options: {
       "__ide_work_dir",
       "__code_obj",
       "__mod_name",
+      "__existing_mod",
+      "__mod_file",
       "__f_name",
       "__f_code",
       "__k",
