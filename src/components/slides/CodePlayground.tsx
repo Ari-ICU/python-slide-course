@@ -24,6 +24,8 @@ interface CodePlaygroundProps {
   presetInputs?: string[];
   autoRun?: boolean;
   compact?: boolean;
+  size?: "compact" | "default" | "workspace";
+  onCodeChange?: (nextCode: string) => void;
   className?: string;
 }
 
@@ -33,6 +35,8 @@ export function CodePlayground({
   presetInputs,
   autoRun = false,
   compact = false,
+  size,
+  onCodeChange,
   className,
 }: CodePlaygroundProps) {
   const [code, setCode] = useState(initialCode);
@@ -60,6 +64,7 @@ export function CodePlayground({
     setCode(initialCode);
     setInputsRaw((presetInputs || []).join(", "));
     setResult(autoRun ? runPython(initialCode, { inputs: presetInputs }) : null);
+    onCodeChange?.(initialCode);
   };
 
   const handleCopy = async () => {
@@ -96,15 +101,22 @@ export function CodePlayground({
       const end = el.selectionEnd;
       const next = code.slice(0, start) + "    " + code.slice(end);
       setCode(next);
+      onCodeChange?.(next);
       requestAnimationFrame(() => {
         el.selectionStart = el.selectionEnd = start + 4;
       });
     }
   };
 
-  const editorHeightClass = compact
-    ? "min-h-[140px] max-h-[240px]"
-    : "min-h-[190px] max-h-[300px]";
+  const resolvedSize = size ?? (compact ? "compact" : "default");
+  const editorHeightClass =
+    resolvedSize === "workspace"
+      ? "min-h-[340px] max-h-[540px]"
+      : resolvedSize === "compact"
+        ? "min-h-[140px] max-h-[240px]"
+        : "min-h-[190px] max-h-[300px]";
+  const outputMaxHeightClass =
+    resolvedSize === "workspace" ? "max-h-72" : "max-h-40";
 
   return (
     <Card
@@ -216,7 +228,11 @@ export function CodePlayground({
 
           <textarea
             value={code}
-            onChange={(e) => setCode(e.target.value)}
+            onChange={(e) => {
+              const next = e.target.value;
+              setCode(next);
+              onCodeChange?.(next);
+            }}
             onScroll={handleScroll}
             onKeyDown={handleKeyDown}
             spellCheck={false}
@@ -251,7 +267,12 @@ export function CodePlayground({
               </span>
             </div>
 
-            <div className="max-h-40 overflow-auto px-4 py-2.5 font-mono text-[13px] leading-5">
+            <div
+              className={cn(
+                "overflow-auto px-4 py-2.5 font-mono text-[13px] leading-5",
+                outputMaxHeightClass
+              )}
+            >
               {result.output ? (
                 <pre className="whitespace-pre-wrap text-emerald-300">{result.output}</pre>
               ) : result.ok ? (
