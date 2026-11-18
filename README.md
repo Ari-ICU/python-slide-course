@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Python Programming — Interactive Short Course Slides
+
+A modern, clean, interactive presentation deck for teaching and learning Python Programming, built with **Next.js**, **Tailwind CSS**, **shadcn/ui**, **Motion**, **Lucide Icons**, and an integrated zero-dependency **in-browser Python runner**.
+
+## Features
+
+- **33 Part-by-Part Slides across 7 Modules (`00` – `06`)**: Welcome, Variables & Types, Logic & Decisions, Loops, Lists & Dicts, Functions & Error Handling, and Object-Oriented Programming (OOP), with interactive syntax breakdowns on key slides.
+- **Live Editable Python Playground**: Students and teachers can edit and run Python snippets directly on the slides with syntax highlighting, line numbers, Tab indentation, and instant console output.
+- **Step-by-Step Memory Tracer**: Step through code line-by-line while watching variable boxes update live in memory.
+- **Interactive Checkpoints & Practice Labs**: Built-in multiple-choice quizzes with instant explanations and guided coding labs with hints and sample solutions.
+- **Teacher Presenter Notes (`N`)**: Slide-over drawer with time estimates, learning goals, speaking prompts, student questions, and common pitfall alerts.
+- **Live Python Scratchpad (`P`)**: Pop-open sandbox accessible from any slide to test student "What if...?" questions live.
+- **Classroom Ready**: Light/Dark theme toggle (`T`), Fullscreen (`F`), Slides Overview grid (`O`), URL hash linking (`#slide-12`), and Print / Save PDF export.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Keyboard Shortcuts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `←` / `→` / `Space`: Previous / Next slide
+- `O`: Toggle Slides Overview grid
+- `N`: Toggle Teacher Presenter Notes
+- `P`: Toggle Live Python Scratchpad
+- `T`: Toggle Light / Dark theme
+- `F`: Toggle Fullscreen
 
-## Learn More
+## Customizing Slides
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Edit modules, slide content, code demos, quizzes, and teacher notes in [`src/data/slides.ts`](./src/data/slides.ts).
