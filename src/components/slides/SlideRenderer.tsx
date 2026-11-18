@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import {
@@ -61,6 +62,8 @@ const TONE_STYLES: Record<
     text: "text-rose-700 dark:text-rose-300",
   },
 };
+
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 const MODULE_MAP: Record<string, string> = {
   "01": "basics",
@@ -124,7 +127,7 @@ export function SlideRenderer({
                   )}
                 >
                   <Code2 />
-                  Open Python IDE
+                  Open Scratchpad
                 </Link>
                 <span className="text-xs text-muted-foreground">
                   Press <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[11px]">→</kbd> or{" "}
@@ -383,16 +386,30 @@ export function SlideRenderer({
                   transition={{ delay: 0.04 * i }}
                 >
                   <Card className={cn("h-full justify-between gap-2.5 p-4", st.border)}>
-                    <div className="space-y-2">
-                      <span
-                        className={cn(
-                          "inline-block rounded-md px-2.5 py-1 font-mono text-xs font-bold",
-                          st.badge
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-2.5">
+                        {card.logo && (
+                          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border bg-background p-1.5 shadow-2xs">
+                            <Image
+                              src={`${BASE_PATH}${card.logo}`}
+                              alt={card.logoAlt || card.pill}
+                              width={28}
+                              height={28}
+                              unoptimized
+                              className="size-7 object-contain"
+                            />
+                          </div>
                         )}
-                      >
-                        {card.pill}
-                      </span>
-                      <div className="rounded-lg border bg-muted/40 px-2.5 py-1.5 font-mono text-xs font-semibold text-foreground">
+                        <span
+                          className={cn(
+                            "inline-block rounded-md px-2.5 py-1 font-mono text-xs font-bold",
+                            st.badge
+                          )}
+                        >
+                          {card.pill}
+                        </span>
+                      </div>
+                      <div className="rounded-lg border bg-muted/40 px-2.5 py-1.5 font-mono text-xs font-semibold text-foreground whitespace-pre-wrap">
                         {card.example}
                       </div>
                       <p className="text-[13px] leading-relaxed text-muted-foreground">

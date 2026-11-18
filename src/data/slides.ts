@@ -86,6 +86,8 @@ export interface SlideData {
   cards?: Array<{
     pill: string;
     accent: AccentTone;
+    logo?: string;
+    logoAlt?: string;
     example: string;
     desc: string;
     tip: string;
@@ -129,8 +131,8 @@ export const SLIDES: SlideData[] = [
     subtitle:
       "A clear, part-by-part introduction to Python — every concept broken down into small visual steps with live runnable examples.",
     highlights: [
-      { icon: "play", label: "Live Code & Python IDE", detail: "Run slide demos inline or open the full /scratchpad IDE" },
-      { icon: "layers", label: "Part-by-Part Breakdowns", detail: "Learn IDE tools, syntax anatomy & memory step by step" },
+      { icon: "play", label: "Live Code on Every Slide", detail: "Edit & run Python right inside the lesson or Scratchpad" },
+      { icon: "layers", label: "IDE & Part-by-Part Guides", detail: "Starts with VS Code, Antigravity, PyCharm, Jupyter & syntax" },
       { icon: "check", label: "Practice Labs & Quizzes", detail: "Check understanding after every core skill" },
     ],
     roadmap: [
@@ -192,23 +194,23 @@ print("Total minutes:", hours * 60)`,
     moduleId: "intro",
     layout: "type-cards",
     badge: "Module 00 • IDE & Core Tools",
-    title: "What Is an IDE? (Editor, Runner, Console & Files)",
-    lead: "An **IDE (Integrated Development Environment)** is your coding workspace. Instead of plain Notepad, an IDE gives you a smart editor, Python engine, console terminal, and variable inspector together.",
+    title: "What Is an IDE? (Editor, Terminal & Debugger)",
+    lead: "An **IDE (Integrated Development Environment)** is software for writing and running code. Instead of plain Notepad, it combines a smart editor, Python runner, terminal, and debugger in one window.",
     syntaxAnatomy: {
-      title: "4 Core Parts of Any Python IDE",
+      title: "4 Essential Parts Inside Every Real IDE",
       parts: [
-        { token: "Code Editor", label: "Write .py Files", explain: "Highlights syntax colors, numbers every line, and handles 4-space indentation.", tone: "blue" },
-        { token: "Interpreter", label: "Run Engine", explain: "Python 3 checks grammar and executes your instructions line by line.", tone: "amber" },
-        { token: "Console", label: "Output & Errors", explain: "Shows `print()` output, `input()` prompts, and traceback clues.", tone: "emerald" },
-        { token: "Variables", label: "Memory View", explain: "Inspect live variable names, types, and values while debugging.", tone: "purple" },
+        { token: "Code Editor", label: "Write .py Files", explain: "Syntax color highlighting, line numbers, autocomplete, and 4-space auto-indent.", tone: "blue" },
+        { token: "Interpreter", label: "Python Engine", explain: "Runs your `.py` file top to bottom via `python` / `python3`.", tone: "amber" },
+        { token: "Terminal", label: "Console Output", explain: "Displays `print()` output, `input()` prompts, and error tracebacks.", tone: "emerald" },
+        { token: "Debugger", label: "Breakpoints & Vars", explain: "Pause execution on any line and inspect variables step by step.", tone: "purple" },
       ],
     },
     cards: [
       {
-        pill: ".py Files & Modules",
+        pill: ".py Script Files",
         accent: "blue",
         example: "main.py  •  utils.py",
-        desc: "Python programs are plain text files ending in `.py`. Larger apps organize helpers into files you can `import`.",
+        desc: "Python programs are saved as plain text files ending in `.py`. Larger projects split helpers across files you can `import`.",
         tip: "Use lowercase names without spaces like `my_app.py`.",
       },
       {
@@ -216,77 +218,82 @@ print("Total minutes:", hours * 60)`,
         accent: "purple",
         example: 'def greet():  # comment',
         desc: "IDEs color keywords, text strings, numbers, and `#` comments differently so typos jump out immediately.",
-        tip: "If text stays green, check for a missing closing quote!",
+        tip: "If text stays one color, check for an unclosed quote!",
       },
       {
         pill: "Auto-Indent (4 Spaces)",
         accent: "amber",
         example: 'if score >= 80:\n    print("Pass")',
-        desc: "Python uses **4-space indentation** after a colon `:` to group code blocks. Good IDEs indent automatically on `Enter`.",
+        desc: "Python uses **4-space indentation** after a colon `:` to group code blocks. Modern IDEs indent automatically on `Enter`.",
         tip: "Never mix Tabs and spaces — stick to 4 spaces.",
       },
       {
-        pill: "Tracebacks & Bugs",
+        pill: "Extensions & Tracebacks",
         accent: "emerald",
         example: 'File "main.py", line 3\nNameError: ...',
-        desc: "When code hits a bug, the Console prints a **traceback** showing the exact file, line number, and error name.",
+        desc: "IDEs install language extensions for autocomplete and show **tracebacks** in the terminal pointing to exact error lines.",
         tip: "Read tracebacks from the bottom line up!",
       },
     ],
     notes: {
       duration: "4 min",
-      goal: "Demystify IDEs, .py files, syntax highlighting, indentation, and tracebacks before writing code.",
-      say: "Point out each part of an IDE and mention that students already have this exact layout in our Scratchpad page (`P`).",
-      ask: "Why is syntax highlighting and a line number gutter so helpful when learning?",
-      watchOut: "Reassure students not to fear red traceback messages — they tell you the exact line number to check.",
+      goal: "Demystify real IDEs, .py files, syntax highlighting, indentation, extensions, and terminal tracebacks.",
+      say: "Explain that an IDE is to programmers what Microsoft Word + Spellcheck is to writers — it catches typos early and runs code in one click.",
+      ask: "Has anyone opened VS Code, Google Antigravity, or another code editor before?",
+      watchOut: "Remind beginners not to fear red terminal traceback text — it gives the exact file and line number to inspect.",
     },
   },
   {
     id: "choose-ide",
     moduleId: "intro",
-    layout: "compare",
-    badge: "Module 00 • IDE & Setup",
-    title: "Python IDEs: Desktop Tools & Our Browser IDE",
-    lead: "Programmers choose different IDEs depending on their project. For this course, you can start immediately with our built-in **Python 3.12 IDE** (`/scratchpad`) — zero installation required!",
-    columns: [
+    layout: "type-cards",
+    badge: "Module 00 • Real Python IDEs",
+    title: "Popular Python IDEs Developers Use",
+    lead: "When building real Python apps on your computer, programmers pick tools like **VS Code**, **Google Antigravity**, **PyCharm**, or **Jupyter Notebook** depending on their workflow.",
+    cards: [
       {
-        title: "Course Browser IDE (/scratchpad)",
-        tone: "blue",
-        rule: "Built-In • Zero Setup",
-        example: "# Press P or Open Python IDE\nimport json, math\nprint(round(math.pi, 4))",
-        desc: "Runs real **Python 3.12 (CPython Wasm)** right in your browser with multi-file tabs, Console, Stdin, and live Variables inspector.",
+        pill: "VS Code",
+        accent: "blue",
+        logo: "/logos/vscode.svg",
+        logoAlt: "Visual Studio Code official logo",
+        example: "code .  •  Python Extension",
+        desc: "Fast, free code editor by Microsoft. Install the official **Python** extension for smart autocomplete, linting, Git tools, and integrated terminal.",
+        tip: "Most popular all-around editor for beginners and pros.",
       },
       {
-        title: "VS Code / PyCharm",
-        tone: "purple",
-        rule: "Industry Desktop IDEs",
-        example: "# Run in local terminal:\npython main.py\n# or python3 main.py",
-        desc: "Popular desktop IDEs with file explorers, extensions, virtual environments (`venv`), Git integration, and step debuggers.",
+        pill: "Google Antigravity",
+        accent: "purple",
+        logo: "/logos/antigravity.svg",
+        logoAlt: "Google Antigravity official logo",
+        example: "AI Agentic IDE  •  Editor + Terminal",
+        desc: "Next-generation AI-powered IDE by Google uniting a full code editor, terminal, and browser preview with an autonomous agent that plans, edits, and verifies code.",
+        tip: "Great for building full apps and learning with guided workflows.",
       },
       {
-        title: "IDLE & Jupyter Notebook",
-        tone: "emerald",
-        rule: "Starter & Data Science",
-        example: ">>> 2 + 2\n4\n>>> name = 'Ada'",
-        desc: "IDLE ships inside the official `python.org` installer; Jupyter Notebooks combine notes, charts, and runnable cells for data analysis.",
+        pill: "PyCharm",
+        accent: "emerald",
+        logo: "/logos/pycharm.svg",
+        logoAlt: "PyCharm official logo",
+        example: "Dedicated Python IDE  •  JetBrains",
+        desc: "Purpose-built Python IDE with smart refactoring, visual debugger, test runner, and built-in virtual environment (`venv`) setup out of the box.",
+        tip: "Ideal for multi-file Python backends and large projects.",
+      },
+      {
+        pill: "Jupyter Notebook",
+        accent: "amber",
+        logo: "/logos/jupyter.svg",
+        logoAlt: "Jupyter official logo",
+        example: "notebook.ipynb  •  Code Cells",
+        desc: "Interactive notebook workspace combining formatted Markdown notes, live Python code cells, data tables, and charts in one document.",
+        tip: "Standard tool for AI, Machine Learning, and Data Science.",
       },
     ],
-    codeBlock: {
-      title: "Try IDE Standard Library: math Module + round()",
-      code: `# Try running standard library code right here or in /scratchpad
-import math
-
-radius = 5
-area = round(math.pi * radius * radius, 2)
-print("Circle area:", area)
-print("Type:", type(area))`,
-    },
     notes: {
       duration: "4 min",
-      goal: "Show students real-world Python IDEs (VS Code, PyCharm, IDLE, Jupyter) and introduce the built-in /scratchpad Python 3 IDE.",
-      say: "Tell students: press P anytime to open the standalone Python IDE (/scratchpad), create multiple .py files, and run full Python 3 code.",
-      ask: "Have you ever installed VS Code or Python on your laptop before?",
-      watchOut: "Remind Windows/macOS desktop learners that macOS often uses `python3` in terminal while Windows uses `python` or `py`.",
+      goal: "Introduce real-world IDEs (VS Code, Google Antigravity, PyCharm, Jupyter) with their official brand marks and explain when developers choose each.",
+      say: "Show each IDE card: VS Code for lightweight flexibility, Google Antigravity for AI-assisted engineering, PyCharm for deep Python projects, and Jupyter for data/AI notebooks.",
+      ask: "Which IDE workflow fits what you want to build most — automation scripts, web apps, or data science?",
+      watchOut: "Clarify that Python itself (`python.org`) is the language/interpreter, while VS Code, Antigravity, and PyCharm are IDE workspaces that run Python.",
     },
   },
 
