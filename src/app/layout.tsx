@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import "@fontsource-variable/plus-jakarta-sans";
 import "@fontsource-variable/jetbrains-mono";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
     "Modern interactive Python programming course slides with live code execution, step-by-step memory tracer, quizzes, and teacher presenter notes.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning className="h-full antialiased">
       <body
