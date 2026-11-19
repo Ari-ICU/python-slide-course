@@ -563,7 +563,7 @@ print(f"20% off single price: \${price * 0.8:.2f}")`,
     lead: "Python works like a smart calculator. Pay special attention to the three division-related operators: `/`, `//`, and `%`.",
     realCase: {
       title: "Real-World Case: Sharing Snacks Fairly & Checking Leftovers",
-      text: "Imagine splitting 17 cookies among 5 students. Sometimes you want the exact decimal split (`3.4` with `/`), sometimes you only hand out whole cookies (`3` each with `//`), and sometimes you want to count the leftover cookies (`2` remaining with `%`).",
+      text: "Suppose you share a batch of cookies fairly among students. Depending on your goal, Python gives you 3 division tools: exact split with decimals (/), whole cookies only (//), and leftover cookies in the jar (%).",
     },
     cards: [
       {
