@@ -40,6 +40,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { InteractiveDotBackground } from "@/components/slides/InteractiveDotBackground";
 import { PythonIdeEditor } from "@/components/slides/PythonIdeEditor";
 import {
   createEmptyWorkspace,
@@ -469,8 +470,9 @@ export function ScratchpadWorkspace() {
       </header>
 
       {/* Full IDE Workbench Container */}
-      <main className="bg-dot-stage flex-1 flex flex-col p-3 sm:p-4 lg:p-5">
-        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm">
+      <main className="bg-dot-stage relative flex-1 flex flex-col p-3 sm:p-4 lg:p-5">
+        <InteractiveDotBackground />
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm">
           {/* File Tabs & Action Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/45 px-2.5 py-2">
             {/* Multi-file Tabs */}

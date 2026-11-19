@@ -35,6 +35,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { InteractiveDotBackground } from "@/components/slides/InteractiveDotBackground";
 import { OverviewDialog } from "@/components/slides/OverviewDialog";
 import { SlideRenderer } from "@/components/slides/SlideRenderer";
 import {
@@ -373,7 +374,7 @@ export function SlideDeck() {
 
         {/* Main Slide Stage */}
         <main
-          className="bg-dot-stage flex-1 flex items-center justify-center px-3 py-5 sm:px-6 sm:py-7"
+          className="bg-dot-stage relative flex-1 flex items-center justify-center px-3 py-5 sm:px-6 sm:py-7"
           onTouchStart={(e) => {
             touchStartX.current = e.changedTouches[0].clientX;
           }}
@@ -387,7 +388,8 @@ export function SlideDeck() {
             }
           }}
         >
-          <div className="w-full max-w-6xl">
+          <InteractiveDotBackground accentColor={currentModule.color} />
+          <div className="relative z-10 w-full max-w-6xl">
             <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card p-5 shadow-[0_8px_30px_rgb(15_23_42_/_0.05)] dark:shadow-[0_10px_32px_rgb(0_0_0_/_0.35)] sm:p-8 lg:p-10">
               <div
                 aria-hidden="true"

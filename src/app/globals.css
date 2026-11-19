@@ -132,10 +132,14 @@
 
 .bg-dot-stage {
   background-image: radial-gradient(
-    color-mix(in oklch, var(--foreground) 9%, transparent) 1px,
-    transparent 1px
+    color-mix(in oklch, var(--foreground) 12%, transparent) 1.35px,
+    transparent 1.35px
   );
   background-size: 24px 24px;
+}
+
+.bg-dot-stage:has([data-dots-active="true"]) {
+  background-image: none;
 }
 
 @media print {
