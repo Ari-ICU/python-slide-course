@@ -8,6 +8,7 @@ export type AccentTone = "blue" | "amber" | "emerald" | "purple" | "red";
 export type SlideLayout =
   | "hero"
   | "ide-tour"
+  | "module-intro"
   | "real-case"
   | "concept-flow"
   | "split-code"
@@ -17,6 +18,21 @@ export type SlideLayout =
   | "quiz"
   | "exercise"
   | "visual-collection";
+
+export interface DefinitionItem {
+  term: string;
+  badge?: string;
+  meaning: string;
+  exampleHint?: string;
+  tone: AccentTone;
+}
+
+export interface ModuleIntroConfig {
+  goal: string;
+  whyItMatters: string;
+  definitions: DefinitionItem[];
+  lessons: Array<{ part: string; title: string }>;
+}
 
 export interface ModuleInfo {
   id: string;
@@ -114,6 +130,7 @@ export interface SlideData {
   solutionCode?: string;
   collectionVisual?: CollectionVisualConfig;
   codeBlock?: CodeBlockConfig;
+  moduleIntro?: ModuleIntroConfig;
   notes: TeacherNotes;
 }
 
@@ -266,6 +283,62 @@ print("Total minutes:", hours * 60)`,
   },
 
   /* ==================== MODULE 01: VARIABLES & TYPES ==================== */
+  {
+    id: "module-01-intro",
+    moduleId: "basics",
+    layout: "module-intro",
+    badge: "Module 01 • Introduction & Definitions",
+    title: "Module 01: Variables, Types & Output",
+    lead: "Before exploring real-world cases and Python syntax, learn the core vocabulary programmers use to store, label, and display information.",
+    moduleIntro: {
+      goal: "Store values inside named boxes, distinguish text from numbers and booleans, read user input, and format clean output.",
+      whyItMatters: "Every Python program—from calculators to AI tools—begins by holding values in variables and showing clear results on screen.",
+      definitions: [
+        {
+          term: "Output & Comments",
+          badge: "print() / #",
+          tone: "blue",
+          meaning: "Output (`print()`) shows text on screen for users; comments (`#`) are private notes ignored by Python.",
+          exampleHint: "Like a store receipt vs a sticky note",
+        },
+        {
+          term: "Variable",
+          badge: "name = value",
+          tone: "amber",
+          meaning: "A labeled storage box in memory that holds a value you can read or update later.",
+          exampleHint: "Read `=` as 'store inside', not math equals",
+        },
+        {
+          term: "Data Type",
+          badge: "str / int / float / bool",
+          tone: "emerald",
+          meaning: "The kind of value—text, whole number, decimal, or True/False—so Python knows which operations apply.",
+          exampleHint: '`\"42\"` is text; `42` is a math number',
+        },
+        {
+          term: "Input & f-string",
+          badge: 'input() / f"..."',
+          tone: "purple",
+          meaning: "`input()` captures keyboard text (`str`); f-strings drop variables cleanly inside `{ }` placeholders.",
+          exampleHint: "Convert text with `int()` before doing math",
+        },
+      ],
+      lessons: [
+        { part: "01", title: "print() & #" },
+        { part: "02", title: "Variables" },
+        { part: "03", title: "4 Core Types" },
+        { part: "04", title: "Input & int()" },
+        { part: "05", title: "f-strings" },
+      ],
+    },
+    notes: {
+      duration: "2 min",
+      goal: "Introduce Module 01 vocabulary before diving into real-world cases and syntax.",
+      say: "Walk through the 4 key terms first so words like 'variable', 'type', and 'comment' feel familiar on the next slides.",
+      ask: "What is the difference between typing `42` and typing `\"42\"`?",
+      watchOut: "Reassure beginners that we will explore each term visually one by one.",
+    },
+  },
   {
     id: "first-program",
     moduleId: "basics",
@@ -554,6 +627,62 @@ print(f"20% off single price: \${price * 0.8:.2f}")`,
   },
 
   /* ==================== MODULE 02: LOGIC & DECISIONS ==================== */
+  {
+    id: "module-02-intro",
+    moduleId: "logic",
+    layout: "module-intro",
+    badge: "Module 02 • Introduction & Definitions",
+    title: "Module 02: Logic, Math & Decisions",
+    lead: "Before running real-world examples, learn the 4 building blocks Python uses to divide numbers, compare values, and choose code branches.",
+    moduleIntro: {
+      goal: "Split numbers with `/`, `//`, and `%`, compare values into `True`/`False`, combine rules with `and`/`or`/`not`, and branch using `if`/`elif`/`else`.",
+      whyItMatters: "Programs become intelligent when they can test conditions—like pass marks, discounts, or sensor thresholds—and pick the right action.",
+      definitions: [
+        {
+          term: "Division Operators",
+          badge: "/   //   %",
+          tone: "blue",
+          meaning: "`/` gives an exact decimal split, `//` keeps only whole shares, and `%` finds the leftover remainder.",
+          exampleHint: "17 cookies ÷ 5 kids → `3.4`, `3` whole, `2` left",
+        },
+        {
+          term: "Comparison",
+          badge: "==  !=  >=  <=",
+          tone: "amber",
+          meaning: "Compares two values like a Yes/No question and always produces a boolean (`True` or `False`).",
+          exampleHint: "`==` asks 'are they equal?' (`=` stores)",
+        },
+        {
+          term: "Logical Operators",
+          badge: "and  or  not",
+          tone: "emerald",
+          meaning: "`and` needs both checks `True`, `or` needs at least one `True`, and `not` flips `True` ↔ `False`.",
+          exampleHint: "Combine multiple rules into one decision",
+        },
+        {
+          term: "Conditional Branch",
+          badge: "if / elif / else",
+          tone: "purple",
+          meaning: "Checks rules top to bottom and executes only the FIRST matching indented block.",
+          exampleHint: "Like a thermostat picking Hot, Warm, or Cool",
+        },
+      ],
+      lessons: [
+        { part: "01", title: "Math (/ // %)" },
+        { part: "02", title: "Comparisons" },
+        { part: "03", title: "and / or / not" },
+        { part: "04", title: "if / elif / else" },
+        { part: "05", title: "Checkpoint #1" },
+      ],
+    },
+    notes: {
+      duration: "2 min",
+      goal: "Define operators, comparisons, boolean logic, and conditionals before the Module 02 real cases.",
+      say: "Preview the 4 cards briefly so students know *why* we have 3 division symbols and how comparisons feed into `if` checks.",
+      ask: "Which everyday decision checks TWO rules at once (`and`), and which accepts EITHER rule (`or`)?",
+      watchOut: "Highlight `=` (store) vs `==` (compare) early so it clicks before coding.",
+    },
+  },
   {
     id: "math-operators",
     moduleId: "logic",
@@ -851,6 +980,62 @@ else:
 
   /* ==================== MODULE 03: LOOPS ==================== */
   {
+    id: "module-03-intro",
+    moduleId: "loops",
+    layout: "module-intro",
+    badge: "Module 03 • Introduction & Definitions",
+    title: "Module 03: Loops & Repetition",
+    lead: "Before stepping through loop animations, understand what loops, iterations, accumulators, and early loop exits mean.",
+    moduleIntro: {
+      goal: "Repeat tasks automatically with `for` and `while` loops, accumulate running totals, and steer loops using `break` and `continue`.",
+      whyItMatters: "Instead of copy-pasting code 1,000 times, loops let a few clean lines handle days, students, or files of any size.",
+      definitions: [
+        {
+          term: "Loop & Iteration",
+          badge: "Repeat",
+          tone: "blue",
+          meaning: "A loop runs a block of indented lines repeatedly; each single pass through the loop is one iteration.",
+          exampleHint: "Write 2 lines instead of 365 `print()` lines",
+        },
+        {
+          term: "for Loop & range()",
+          badge: "Known Sequence",
+          tone: "amber",
+          meaning: "Loops once per item in a sequence. `range(start, stop)` starts at `start` and stops BEFORE `stop`.",
+          exampleHint: "`range(1, 5)` yields `1, 2, 3, 4`",
+        },
+        {
+          term: "while Loop",
+          badge: "Until False",
+          tone: "emerald",
+          meaning: "Repeats as long as a condition stays `True`. Always update the counter inside so it eventually stops.",
+          exampleHint: "Like a rocket countdown: `3, 2, 1, Liftoff!`",
+        },
+        {
+          term: "break & continue",
+          badge: "Loop Steering",
+          tone: "purple",
+          meaning: "`break` exits the loop completely; `continue` skips only the current round and moves to the next item.",
+          exampleHint: "Emergency stop (`break`) vs skip one box (`continue`)",
+        },
+      ],
+      lessons: [
+        { part: "01", title: "Why Loops" },
+        { part: "02", title: "for & range()" },
+        { part: "03", title: "while Loops" },
+        { part: "04", title: "break / continue" },
+        { part: "05", title: "Practice Lab #1" },
+      ],
+    },
+    notes: {
+      duration: "2 min",
+      goal: "Introduce loop vocabulary (`iteration`, `range`, `while`, `break`, `continue`) before Module 03 real cases.",
+      say: "Explain that a `for` loop is for known counts/lists, while a `while` loop repeats until a condition turns `False`.",
+      ask: "What happens if a `while` loop condition never becomes `False`?",
+      watchOut: "Flag that `range(1, 5)` excludes `5` right from the start.",
+    },
+  },
+  {
     id: "why-loops",
     moduleId: "loops",
     layout: "compare",
@@ -1053,6 +1238,63 @@ for step in range(1, 11):
   },
 
   /* ==================== MODULE 04: LISTS & DICTIONARIES ==================== */
+  {
+    id: "module-04-intro",
+    moduleId: "collections",
+    layout: "module-intro",
+    badge: "Module 04 • Introduction & Definitions",
+    title: "Module 04: Lists & Dictionaries",
+    lead: "When one variable isn't enough, Python groups related values into collections. Here are the key definitions before the visual cases.",
+    moduleIntro: {
+      goal: "Store ordered items in lists, read positions with positive/negative indices and slices, and map named keys to values in dictionaries.",
+      whyItMatters: "Real apps manage playlists, leaderboards, shopping carts, and user profiles—collections keep all that data organized.",
+      definitions: [
+        {
+          term: "List",
+          badge: "[ item0, item1 ]",
+          tone: "blue",
+          meaning: "An ordered collection inside square brackets `[ ]` that keeps items in sequence and allows duplicates.",
+          exampleHint: '`["apple", "banana", "cherry"]`',
+        },
+        {
+          term: "Index & Slicing",
+          badge: "items[0] / [1:3]",
+          tone: "amber",
+          meaning: "Position numbers start at `0` from the left (or `-1` from the end). `[start:stop]` copies a slice stopping before `stop`.",
+          exampleHint: "`items[-1]` is always the last item",
+        },
+        {
+          term: "Dictionary",
+          badge: "{ key: value }",
+          tone: "emerald",
+          meaning: "A lookup table inside curly braces `{ }` pairing each unique label (`key`) directly with its `value`.",
+          exampleHint: '`{"name": "Mina", "grade": 95}`',
+        },
+        {
+          term: ".get() & .items()",
+          badge: "Safe Dict Tools",
+          tone: "purple",
+          meaning: "`.get(key, default)` avoids crashes when a key is missing; `.items()` loops over both key and value together.",
+          exampleHint: "Like looking up a field on a student ID card",
+        },
+      ],
+      lessons: [
+        { part: "01", title: "Lists & Index" },
+        { part: "02", title: "Methods & Slice" },
+        { part: "03", title: "Filter Lists" },
+        { part: "04", title: "Dictionaries" },
+        { part: "05", title: ".items() Loop" },
+        { part: "06", title: "Checkpoint #2" },
+      ],
+    },
+    notes: {
+      duration: "2 min",
+      goal: "Contrast ordered lists (position lookup) with dictionaries (key lookup) before Module 04 slides.",
+      say: "Lists look things up by number (`0, 1, 2`); dictionaries look things up by label (`\"name\"`, `\"grade\"`).",
+      ask: "Would you store a student's name, grade, and email as a list or a dictionary? Why?",
+      watchOut: "Zero-based indexing (`0` is first) is new for non-coders—highlight it clearly.",
+    },
+  },
   {
     id: "lists-basics",
     moduleId: "collections",
@@ -1339,6 +1581,62 @@ print(student.get("role", "Guest"))`,
 
   /* ==================== MODULE 05: FUNCTIONS & ERRORS ==================== */
   {
+    id: "module-05-intro",
+    moduleId: "functions",
+    layout: "module-intro",
+    badge: "Module 05 • Introduction & Definitions",
+    title: "Module 05: Functions & Error Handling",
+    lead: "Before testing function machines and error shields, define how functions receive inputs, return answers, and protect against bad data.",
+    moduleIntro: {
+      goal: "Build reusable functions with `def`, send back values with `return`, use default parameters and local scope, and catch errors with `try/except`.",
+      whyItMatters: "Clean code avoids repeating the same logic in ten places and never crashes when a user types unexpected text.",
+      definitions: [
+        {
+          term: "Function (def)",
+          badge: "def name():",
+          tone: "blue",
+          meaning: "A named, reusable recipe. `def` saves the instructions; calling `name(...)` actually runs them.",
+          exampleHint: "Fix a formula once, reuse it everywhere",
+        },
+        {
+          term: "Parameters vs return",
+          badge: "Input → Output",
+          tone: "amber",
+          meaning: "Parameters accept inputs; `return` hands a usable value back to your program (unlike `print()`, which only shows text).",
+          exampleHint: "Without `return`, a function hands back `None`",
+        },
+        {
+          term: "Defaults & Scope",
+          badge: "Local Privacy",
+          tone: "emerald",
+          meaning: "Default values fill in optional inputs automatically. Variables created inside `def` stay private to that function.",
+          exampleHint: '`def greet(name, role="Student"):`',
+        },
+        {
+          term: "try / except",
+          badge: "Error Shield",
+          tone: "purple",
+          meaning: "Protects risky lines (like `float(text)` or division) and catches specific errors gracefully instead of crashing.",
+          exampleHint: "Handles `ValueError` and `ZeroDivisionError`",
+        },
+      ],
+      lessons: [
+        { part: "01", title: "def Anatomy" },
+        { part: "02", title: "return vs print" },
+        { part: "03", title: "Defaults & Scope" },
+        { part: "04", title: "try / except" },
+        { part: "05", title: "Practice Lab #2" },
+      ],
+    },
+    notes: {
+      duration: "2 min",
+      goal: "Introduce function terminology and defensive error handling before Module 05 real cases.",
+      say: "Think of a function like a machine: inputs go in (parameters), work happens inside, and `return` hands the result out.",
+      ask: "Why is `return` better than `print()` when calculating a discount or tax amount?",
+      watchOut: "Emphasize `define != call` right away.",
+    },
+  },
+  {
     id: "functions-intro",
     moduleId: "functions",
     layout: "concept-flow",
@@ -1588,6 +1886,62 @@ print(c_to_f("hot"))`,
   },
 
   /* ==================== MODULE 06: OBJECT-ORIENTED PROGRAMMING ==================== */
+  {
+    id: "module-06-intro",
+    moduleId: "oop",
+    layout: "module-intro",
+    badge: "Module 06 • Introduction & Definitions",
+    title: "Module 06: Object-Oriented Programming",
+    lead: "Before creating custom Python classes, learn the 4 essential OOP concepts: blueprints, instances, constructors (`__init__` / `self`), and inheritance.",
+    moduleIntro: {
+      goal: "Define custom data types with `class`, initialize independent objects with `__init__` and `self`, format with `__str__`, and extend classes via inheritance.",
+      whyItMatters: "OOP lets large programs model real-world entities—students, bank accounts, products—by bundling data and actions together.",
+      definitions: [
+        {
+          term: "Class vs Object",
+          badge: "Blueprint vs Copy",
+          tone: "blue",
+          meaning: "A `class` is a single blueprint defining shared fields and actions; each `object` (instance) built from it holds its own data.",
+          exampleHint: "1 `Dog` class → `dog1` and `dog2` instances",
+        },
+        {
+          term: "__init__ & self",
+          badge: "Setup & Identity",
+          tone: "amber",
+          meaning: "`__init__` runs automatically when building a new object; `self` always refers to that specific object.",
+          exampleHint: "Keeps `student1.score` separate from `student2`",
+        },
+        {
+          term: "Methods & __str__",
+          badge: "Object Actions",
+          tone: "emerald",
+          meaning: "Methods are functions belonging to a class. `__str__` defines a clean human-readable string for `print(obj)`.",
+          exampleHint: "`account.deposit(45)` updates only `account`",
+        },
+        {
+          term: "Inheritance & super()",
+          badge: "Extend & Reuse",
+          tone: "purple",
+          meaning: "A child class inherits attributes and methods from a parent class and uses `super()` to extend setup without duplicating code.",
+          exampleHint: "`HonorStudent` inherits from `Student`",
+        },
+      ],
+      lessons: [
+        { part: "01", title: "Class & Object" },
+        { part: "02", title: "__init__ & self" },
+        { part: "03", title: "Methods & __str__" },
+        { part: "04", title: "Inheritance" },
+        { part: "05", title: "Checkpoint #3" },
+      ],
+    },
+    notes: {
+      duration: "2 min",
+      goal: "Introduce OOP vocabulary (`class`, `object`, `__init__`, `self`, inheritance) before Module 06 visuals.",
+      say: "Use the house blueprint vs real houses analogy so `class` vs `object` makes sense before any syntax appears.",
+      ask: "If two objects are built from one blueprint, does changing one change the other?",
+      watchOut: "`self` looks strange to beginners—frame it simply as 'this specific object right here'.",
+    },
+  },
   {
     id: "oop-classes-objects",
     moduleId: "oop",
