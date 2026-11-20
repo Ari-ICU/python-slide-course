@@ -20,6 +20,7 @@ import { CodePlayground } from "@/components/slides/CodePlayground";
 import { CollectionVisual } from "@/components/slides/CollectionVisual";
 import { ExerciseLab } from "@/components/slides/ExerciseLab";
 import { IdeVisualBreakdown } from "@/components/slides/IdeVisualBreakdown";
+import { ModuleIntroSlide } from "@/components/slides/ModuleIntroSlide";
 import { QuizBlock } from "@/components/slides/QuizBlock";
 import { RealCaseSlide } from "@/components/slides/RealCaseSlide";
 import { RichText } from "@/components/slides/RichText";
@@ -222,6 +223,14 @@ export function SlideRenderer({
           </p>
         )}
       </div>
+
+      {/* Layout: module-intro */}
+      {slide.layout === "module-intro" && slide.moduleIntro && (
+        <ModuleIntroSlide
+          intro={slide.moduleIntro}
+          onStartModule={!isPrint ? onNextSlide : undefined}
+        />
+      )}
 
       {/* Layout: real-case */}
       {slide.layout === "real-case" && (
